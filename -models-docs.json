@@ -1,0 +1,1985 @@
+[
+  {
+    "model_name": "字字动画视频超分-2k-高级",
+    "family_name": "字字动画视频超分",
+    "description": "视频超分至 2K（高级档）：大模型重绘、精修感最强；输入 ≤30fps、≤300 秒。",
+    "icon": "",
+    "tags": "服务, 视频超分",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "deepseek-v3.2",
+    "family_name": "deepseek-v3.2",
+    "description": "DeepSeek-V3.2是引入DeepSeek Sparse Attention（一种稀疏注意力机制）的正式版模型，也是DeepSeek推出的首个将思考融入工具使用的模型，同时支持思考模式与非思考模式的工具调用。",
+    "icon": "",
+    "tags": "生视频, 推理, 大语言模型",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-0-mini-video-720p",
+    "family_name": "doubao-seedance-2-0-mini",
+    "description": "mini 档（价格更省）。视频参考模型，计费方式为 (参考视频时长+生成视频时长)x【每秒价格】",
+    "icon": "",
+    "tags": "生视频, 视频参考, mini",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "happyhorse-1.0-t2v-1080p",
+    "family_name": "happyhorse-1.0",
+    "description": "",
+    "icon": "",
+    "tags": "生视频, 文生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "music-cover",
+    "family_name": "music-cover",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "music"
+    ]
+  },
+  {
+    "model_name": "Omni-Image2",
+    "family_name": "Omni-Image2",
+    "description": "通用图像生成模型，适合日常文生图与素材生成。",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "image-generation"
+    ]
+  },
+  {
+    "model_name": "eleven_v3",
+    "family_name": "eleven_v3",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "audio"
+    ]
+  },
+  {
+    "model_name": "qwen3.6-plus",
+    "family_name": "qwen3.6-plus",
+    "description": "",
+    "icon": "",
+    "tags": "生文",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai"
+    ]
+  },
+  {
+    "model_name": "wan2.7-image",
+    "family_name": "wan2.7-image",
+    "description": "",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "字字动画视频超分-4k-专业",
+    "family_name": "字字动画视频超分",
+    "description": "视频超分至 4K（专业档）：细节增强最强、纹理锐利；输入 ≤30fps、≤120 秒。",
+    "icon": "",
+    "tags": "服务, 视频超分",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "zzdh-Minimax-h3-2k",
+    "family_name": "zzdh-Minimax-h3",
+    "description": "Minimax H3 视频生成模型（2K 档），支持文生视频、首帧/首尾帧生视频、参考生视频，生成结果原生自带音轨。时长 5~15 秒可调，按秒计费：费用 =（生成视频秒数）×（每秒价格）。",
+    "icon": "",
+    "tags": "生视频, 文生视频, 首尾帧, 参考生, 带音轨",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-0-fast-480p",
+    "family_name": "doubao-seedance-2-0-fast",
+    "description": "fast 档（速度更快）。无视频参考模型，计费方式为 (生成视频时长)x【每秒价格】，视频参考模型请调用-video",
+    "icon": "",
+    "tags": "生视频, 图文参考, 首尾帧, fast",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "kimi-k2.7-code",
+    "family_name": "kimi-k2.7-code",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai"
+    ]
+  },
+  {
+    "model_name": "tongyi-embedding-vision-plus-2026-03-06",
+    "family_name": "tongyi-embedding-vision-plus-2026-03-06",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "embeddings"
+    ]
+  },
+  {
+    "model_name": "zzdh-minimax-h3-限时优惠-对口型-768p",
+    "family_name": "zzdh-minimax-h3-限时优惠",
+    "description": "",
+    "icon": "Minimax",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "字字动画视频超分-4k-高帧率",
+    "family_name": "字字动画视频超分",
+    "description": "视频超分至 4K（极速-高帧率档）：支持 30~60fps 高帧率输入；≤300 秒。",
+    "icon": "",
+    "tags": "服务, 视频超分",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan3.0-i2v-1080p",
+    "family_name": "wan3.0",
+    "description": "通义万相 3.0 图生视频 1080p",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "zzdh-minimax-h3-限时优惠-文生-768p",
+    "family_name": "zzdh-minimax-h3-限时优惠",
+    "description": "",
+    "icon": "Minimax",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "qwen3.7-plus",
+    "family_name": "qwen3.7-plus",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai"
+    ]
+  },
+  {
+    "model_name": "qwq-plus",
+    "family_name": "qwq-plus",
+    "description": "千问QwQ推理模型增强版，基于Qwen2.5模型训练的QwQ推理模型，通过强化学习大幅度提升了模型推理能力。模型数学代码等核心指标（AIME 24/25、livecodebench）以及部分通用指标（IFEval、LiveBench等）达到DeepSeek-R1 满血版水平。",
+    "icon": "",
+    "tags": "生文",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai"
+    ]
+  },
+  {
+    "model_name": "字字动画视频超分-2k-专业",
+    "family_name": "字字动画视频超分",
+    "description": "视频超分至 2K（专业档）：细节增强最强、纹理锐利；输入 ≤30fps、≤120 秒。",
+    "icon": "",
+    "tags": "服务, 视频超分",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-0-fast-720p",
+    "family_name": "doubao-seedance-2-0-fast",
+    "description": "fast 档（速度更快）。无视频参考模型，计费方式为 (生成视频时长)x【每秒价格】，视频参考模型请调用-video",
+    "icon": "",
+    "tags": "生视频, 图文参考, 首尾帧, fast",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-video-优惠版-720p",
+    "family_name": "doubao-seedance-2-video-优惠版",
+    "description": "优惠版（价格更低）。视频参考模型，计费方式为 (参考视频时长+生成视频时长)x【每秒价格】",
+    "icon": "",
+    "tags": "生视频, 视频参考, 优惠版",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-优惠版-1080p",
+    "family_name": "doubao-seedance-2-优惠版",
+    "description": "优惠版（价格更低）。无视频参考模型，计费方式为 (生成视频时长)x【每秒价格】，视频参考模型请调用-video",
+    "icon": "",
+    "tags": "生视频, 图文参考, 首尾帧, 优惠版",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "qwen-image-edit-max",
+    "family_name": "qwen-image-edit-max",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "image-generation"
+    ]
+  },
+  {
+    "model_name": "vidu-q3-turbo-540p-offpeak",
+    "family_name": "vidu-q3-turbo",
+    "description": "",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "zimage",
+    "family_name": "zimage",
+    "description": "由国家超算平台提供的z-image",
+    "icon": "",
+    "tags": "生图, 图片生成",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "image-generation"
+    ]
+  },
+  {
+    "model_name": "qwen-vl-ocr",
+    "family_name": "qwen-vl-ocr",
+    "description": "千问VL-OCR（qwen-vl-ocr），即基于Qwen-VL训练的OCR识别大模型。通过统一模型的方式聚合多种图文识别、解析、处理类任务，提供强大的图文识别能力。",
+    "icon": "",
+    "tags": "生文, 图文识别",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai"
+    ]
+  },
+  {
+    "model_name": "kling-3.0-omni-1080p-noref-mute",
+    "family_name": "kling-3.0-omni",
+    "description": "Kling 3.0 Omni 多模态视频模型，支持参考输入；分辨率、参考模式和音频能力由具体模型变体决定。",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "qwen-image-max",
+    "family_name": "qwen-image-max",
+    "description": "千问图像生成模型Max系列，在各类生成任务中表现出色，相较Plus系列大幅度降低生成图片的AI感，提升图像真实性；具备更真实的人物质感、更细腻的自然纹理、更美观的文字渲染。",
+    "icon": "",
+    "tags": "生图, 图片生成",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "image-generation"
+    ]
+  },
+  {
+    "model_name": "wan3.0-r2v-480p",
+    "family_name": "wan3.0",
+    "description": "通义万相 3.0 参考生视频 480p",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "字字动画视频超分-1080p-标准",
+    "family_name": "字字动画视频超分",
+    "description": "视频超分至 1080p（标准档）：细节与对比度比极速档更强；输入 ≤30fps、≤300 秒。",
+    "icon": "",
+    "tags": "服务, 视频超分",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "deepseek-v4-flash-vision-exp",
+    "family_name": "deepseek-v4-flash-vision-exp",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai",
+      "openai-response"
+    ]
+  },
+  {
+    "model_name": "eleven_flash_v2_5",
+    "family_name": "eleven_flash_v2_5",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "audio"
+    ]
+  },
+  {
+    "model_name": "zzdh-minimax-h3-限时优惠-多图多音频-768p",
+    "family_name": "zzdh-minimax-h3-限时优惠",
+    "description": "",
+    "icon": "Minimax",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "字字动画视频超分-2k-标准",
+    "family_name": "字字动画视频超分",
+    "description": "视频超分至 2K（标准档）：细节与对比度比极速档更强；输入 ≤30fps、≤300 秒。",
+    "icon": "",
+    "tags": "服务, 视频超分",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "eleven_monolingual_v1",
+    "family_name": "eleven_monolingual_v1",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "audio"
+    ]
+  },
+  {
+    "model_name": "eleven_multilingual_v1",
+    "family_name": "eleven_multilingual_v1",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "audio"
+    ]
+  },
+  {
+    "model_name": "wan2.7-videoedit",
+    "family_name": "wan2.7",
+    "description": "",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-video-4k",
+    "family_name": "doubao-seedance-2",
+    "description": "4K 分辨率直出。视频参考模型，计费方式为 (参考视频时长+生成视频时长)x【每秒价格】",
+    "icon": "",
+    "tags": "生视频, 视频参考, 4K",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "music-cover-free",
+    "family_name": "music-cover-free",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "music"
+    ]
+  },
+  {
+    "model_name": "wan3.0-prime-i2v-1080p",
+    "family_name": "wan3.0-prime",
+    "description": "通义万相 3.0 优速版图生视频 1080p",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "字字3D-flash",
+    "family_name": "字字3D-flash",
+    "description": "",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "字字动画视频超分-720p-标准",
+    "family_name": "字字动画视频超分",
+    "description": "视频超分至 720p（标准档）：细节与对比度比极速档更强；输入 ≤30fps、≤300 秒。",
+    "icon": "",
+    "tags": "服务, 视频超分",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "qwen3.7-max",
+    "family_name": "qwen3.7-max",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai"
+    ]
+  },
+  {
+    "model_name": "happyhorse-1.0-r2v-720p",
+    "family_name": "happyhorse-1.0",
+    "description": "",
+    "icon": "",
+    "tags": "生视频, 参考图片生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "qwen-image-2.0-pro",
+    "family_name": "qwen-image-2.0-pro",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "image-generation"
+    ]
+  },
+  {
+    "model_name": "vidu-q3-pro-720p",
+    "family_name": "vidu-q3-pro",
+    "description": "",
+    "icon": "",
+    "tags": "生视频, 按秒计费, 视频生成",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan2.2-kf2v-flash",
+    "family_name": "wan2.2",
+    "description": "wan2.2-kf2v-flash 是由阿里云提供的首尾帧生成模型，计费类型为按秒计费，每秒价格同每次价格\n480p 0.06元/秒\n720p 0.12元/秒\n1080p 0.288元/秒",
+    "icon": "",
+    "tags": "生视频, 视频生成",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan3.0-prime-i2v-720p",
+    "family_name": "wan3.0-prime",
+    "description": "通义万相 3.0 优速版图生视频 720p",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan3.0-prime-r2v-480p",
+    "family_name": "wan3.0-prime",
+    "description": "通义万相 3.0 优速版参考生视频 480p",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan3.0-prime-r2v-720p",
+    "family_name": "wan3.0-prime",
+    "description": "通义万相 3.0 优速版参考生视频 720p",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-1080p",
+    "family_name": "doubao-seedance-2",
+    "description": "无视频参考模型，计费方式为 (生成视频时长)x【每秒价格】，视频参考模型请调用-video",
+    "icon": "",
+    "tags": "生视频, 图文参考, 首尾帧",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "qwen3.8-max",
+    "family_name": "qwen3.8-max",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai"
+    ]
+  },
+  {
+    "model_name": "wan3.0-t2v-480p",
+    "family_name": "wan3.0",
+    "description": "通义万相 3.0 文生视频 480p",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "zzdh-Minimax-h3-480p",
+    "family_name": "zzdh-Minimax-h3",
+    "description": "Minimax H3 视频生成模型（480P 档），支持文生视频、首帧/首尾帧生视频、参考生视频，生成结果原生自带音轨。时长 5~10 秒可调，按秒计费：费用 =（生成视频秒数）×（每秒价格）。",
+    "icon": "import { Minimax } from '@lobehub/icons';",
+    "tags": "生视频, 文生视频, 首尾帧, 参考生, 带音轨",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "字字动画视频超分-1080p-高帧率",
+    "family_name": "字字动画视频超分",
+    "description": "视频超分至 1080p（极速-高帧率档）：支持 30~60fps 高帧率输入；≤600 秒。",
+    "icon": "",
+    "tags": "服务, 视频超分",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "vidu-q3-pro-1080p-offpeak",
+    "family_name": "vidu-q3-pro",
+    "description": "错峰模式，谨慎使用，会进入超长时间排队可能导致失败",
+    "icon": "",
+    "tags": "生视频, 按秒计费, 视频生成",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "vidu-q3-pro-540p-offpeak",
+    "family_name": "vidu-q3-pro",
+    "description": "",
+    "icon": "",
+    "tags": "生视频, 视频生成, 按秒计费",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan3.0-prime-r2v-1080p",
+    "family_name": "wan3.0-prime",
+    "description": "通义万相 3.0 优速版参考生视频 1080p",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-0-fast-video-480p",
+    "family_name": "doubao-seedance-2-0-fast",
+    "description": "fast 档（速度更快）。视频参考模型，计费方式为 (参考视频时长+生成视频时长)x【每秒价格】",
+    "icon": "",
+    "tags": "生视频, 视频参考, fast",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan3.0-prime-i2v-480p",
+    "family_name": "wan3.0-prime",
+    "description": "通义万相 3.0 优速版图生视频 480p",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan3.0-r2v-1080p",
+    "family_name": "wan3.0",
+    "description": "通义万相 3.0 参考生视频 1080p",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-0-mini-720p",
+    "family_name": "doubao-seedance-2-0-mini",
+    "description": "mini 档（价格更省）。无视频参考模型，计费方式为 (生成视频时长)x【每秒价格】，视频参考模型请调用-video",
+    "icon": "",
+    "tags": "生视频, 图文参考, 首尾帧, mini",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "happyhorse-1.0-i2v-720p",
+    "family_name": "happyhorse-1.0",
+    "description": "",
+    "icon": "",
+    "tags": "生视频, 首帧生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "MiniMax-M2.5",
+    "family_name": "MiniMax-M2.5",
+    "description": "MiniMax-M2.5是MiniMax推出的旗舰级开源大模型，经过数十万个真实复杂环境中的大规模强化学习训练，M2.5 在编程、工具调用和搜索、办公等生产力场景都达到或者刷新了行业的 SOTA。",
+    "icon": "",
+    "tags": "生视频, 推理, 大语言模型",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "eleven_multilingual_v2",
+    "family_name": "eleven_multilingual_v2",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "audio"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-480p",
+    "family_name": "doubao-seedance-2",
+    "description": "无视频参考模型，计费方式为 (生成视频时长)x【每秒价格】，视频参考模型请调用-video",
+    "icon": "",
+    "tags": "生视频, 图文参考, 首尾帧",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "qwen3-vl-plus",
+    "family_name": "qwen3-vl-plus",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai"
+    ]
+  },
+  {
+    "model_name": "eleven_music_v2",
+    "family_name": "eleven_music_v2",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "music"
+    ]
+  },
+  {
+    "model_name": "happyhorse-1.0-i2v-1080p",
+    "family_name": "happyhorse-1.0",
+    "description": "",
+    "icon": "",
+    "tags": "生视频, 首帧生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-0-mini-480p",
+    "family_name": "doubao-seedance-2-0-mini",
+    "description": "mini 档（价格更省）。无视频参考模型，计费方式为 (生成视频时长)x【每秒价格】，视频参考模型请调用-video",
+    "icon": "",
+    "tags": "生视频, 图文参考, 首尾帧, mini",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "vidu-q3-turbo-720p-offpeak",
+    "family_name": "vidu-q3-turbo",
+    "description": "",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-优惠版-720p",
+    "family_name": "doubao-seedance-2-优惠版",
+    "description": "优惠版（价格更低）。无视频参考模型，计费方式为 (生成视频时长)x【每秒价格】，视频参考模型请调用-video",
+    "icon": "",
+    "tags": "生视频, 图文参考, 首尾帧, 优惠版",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan3.0-i2v-480p",
+    "family_name": "wan3.0",
+    "description": "通义万相 3.0 图生视频 480p",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan3.0-t2v-720p",
+    "family_name": "wan3.0",
+    "description": "通义万相 3.0 文生视频 720p",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "字字世界模型",
+    "family_name": "字字世界模型",
+    "description": "",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-720p",
+    "family_name": "doubao-seedance-2",
+    "description": "无视频参考模型，计费方式为 (生成视频时长)x【每秒价格】，视频参考模型请调用-video",
+    "icon": "",
+    "tags": "生视频, 图文参考, 首尾帧",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "kling-3.0-omni-720p-noref-audio",
+    "family_name": "kling-3.0-omni",
+    "description": "Kling 3.0 Omni 多模态视频模型，支持参考输入；分辨率、参考模式和音频能力由具体模型变体决定。",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "zzdh-minimax-h3-限时优惠-多参考图生-768p",
+    "family_name": "zzdh-minimax-h3-限时优惠",
+    "description": "",
+    "icon": "Minimax",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "vidu-q3-pro-540p",
+    "family_name": "vidu-q3-pro",
+    "description": "",
+    "icon": "",
+    "tags": "生视频, 按秒计费, 视频生成",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan3.0-i2v-720p",
+    "family_name": "wan3.0",
+    "description": "通义万相 3.0 图生视频 720p",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan3.0-t2v-1080p",
+    "family_name": "wan3.0",
+    "description": "通义万相 3.0 文生视频 1080p",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "zzdh-minimax-h3-限时优惠-多参考图生-480p",
+    "family_name": "zzdh-minimax-h3-限时优惠",
+    "description": "",
+    "icon": "Minimax",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-0-fast-video-720p",
+    "family_name": "doubao-seedance-2-0-fast",
+    "description": "fast 档（速度更快）。视频参考模型，计费方式为 (参考视频时长+生成视频时长)x【每秒价格】",
+    "icon": "",
+    "tags": "生视频, 视频参考, fast",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan2.6-r2v",
+    "family_name": "wan2.6",
+    "description": "",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "字字动画视频超分-4k",
+    "family_name": "字字动画视频超分",
+    "description": "视频超分至 4K（极速档）：保守增强、速度最快，适合批量处理；输入 ≤30fps、≤300 秒。",
+    "icon": "",
+    "tags": "服务, 视频超分",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "字字动画视频超分-720p-高帧率",
+    "family_name": "字字动画视频超分",
+    "description": "视频超分至 720p（极速-高帧率档）：支持 30~60fps 高帧率输入；≤600 秒。",
+    "icon": "",
+    "tags": "服务, 视频超分",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "music-2.6",
+    "family_name": "music-2.6",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "music"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-video-1080p",
+    "family_name": "doubao-seedance-2",
+    "description": "视频参考模型，计费方式为 (参考视频时长+生成视频时长)x【每秒价格】",
+    "icon": "",
+    "tags": "生视频, 视频参考",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "MiniMax-M2.1",
+    "family_name": "MiniMax-M2.1",
+    "description": "MiniMax-M2.1是MiniMax推出的旗舰级开源大模型，聚焦真实世界复杂任务，以多语言编程与长链 Agent 能力为核心优势。",
+    "icon": "",
+    "tags": "生视频, 推理, 大语言模型",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "vidu-q3-pro-1080p",
+    "family_name": "vidu-q3-pro",
+    "description": "按秒计费，即时生成模型",
+    "icon": "",
+    "tags": "生视频, 按秒计费, 视频生成",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-0-mini-video-480p",
+    "family_name": "doubao-seedance-2-0-mini",
+    "description": "mini 档（价格更省）。视频参考模型，计费方式为 (参考视频时长+生成视频时长)x【每秒价格】",
+    "icon": "",
+    "tags": "生视频, 视频参考, mini",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "glm-5",
+    "family_name": "glm-5",
+    "description": "",
+    "icon": "",
+    "tags": "生文, 大语言模型, 阶梯计费",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-5-720p",
+    "family_name": "doubao-seedance-2-5",
+    "description": "",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "glm-5.1",
+    "family_name": "glm-5.1",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai"
+    ]
+  },
+  {
+    "model_name": "happyhorse-1.0-video-edit-720p",
+    "family_name": "happyhorse-1.0",
+    "description": "",
+    "icon": "",
+    "tags": "生视频, 视频编辑",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "kimi-k2.5",
+    "family_name": "kimi-k2.5",
+    "description": "kimi-k2.5是月之暗面迄今发布最全能的模型，原生多模态架构设计，同时支持视觉与文本输入、思考与非思考模式、对话与Agent任务。",
+    "icon": "",
+    "tags": "生文, 推理, 大语言模型",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai"
+    ]
+  },
+  {
+    "model_name": "wan2.7-i2v",
+    "family_name": "wan2.7",
+    "description": "",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan3.0-prime-t2v-720p",
+    "family_name": "wan3.0-prime",
+    "description": "通义万相 3.0 优速版文生视频 720p",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "字字动画视频超分-4k-标准",
+    "family_name": "字字动画视频超分",
+    "description": "视频超分至 4K（标准档）：细节与对比度比极速档更强；输入 ≤30fps、≤300 秒。",
+    "icon": "",
+    "tags": "服务, 视频超分",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "vidu-q3-turbo-1080p-offpeak",
+    "family_name": "vidu-q3-turbo",
+    "description": "",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "字字动画视频超分-1080p",
+    "family_name": "字字动画视频超分",
+    "description": "视频超分至 1080p（极速档）：保守增强、速度最快，适合批量处理；输入 ≤30fps、≤600 秒。",
+    "icon": "",
+    "tags": "服务, 视频超分",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "字字动画视频超分-720p-专业",
+    "family_name": "字字动画视频超分",
+    "description": "视频超分至 720p（专业档）：细节增强最强、纹理锐利；输入 ≤30fps、≤300 秒。",
+    "icon": "",
+    "tags": "服务, 视频超分",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "kling-3.0-omni-720p-ref-audio",
+    "family_name": "kling-3.0-omni",
+    "description": "Kling 3.0 Omni 多模态视频模型，支持参考输入；分辨率、参考模式和音频能力由具体模型变体决定。",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan2.6-i2v",
+    "family_name": "wan2.6",
+    "description": "通义千问的wan2.6图生视频模型，计费类型为按秒计费\n720p：0.36元/秒\n1080p：0.6元/秒",
+    "icon": "",
+    "tags": "生视频, 视频生成",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "Moonshot-Kimi-K2-Instruct",
+    "family_name": "Moonshot-Kimi-K2-Instruct",
+    "description": "Kimi-K2是月之暗面提供的国内首个开源万亿参数MoE模型，激活参数达 320 亿，具有卓越的编码和工具调用能力。",
+    "icon": "",
+    "tags": "生文, 大语言模型",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai"
+    ]
+  },
+  {
+    "model_name": "Omni-Nano",
+    "family_name": "Omni-Nano",
+    "description": "1K 图像生成模型，支持文生图与参考图生成。",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "image-generation"
+    ]
+  },
+  {
+    "model_name": "kling-3.0-omni-720p-noref-mute",
+    "family_name": "kling-3.0-omni",
+    "description": "Kling 3.0 Omni 多模态视频模型，支持参考输入；分辨率、参考模式和音频能力由具体模型变体决定。",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "Omni-Image2-pro",
+    "family_name": "Omni-Image2-pro",
+    "description": "高规格图像生成模型，适合高清素材与精细构图。",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "image-generation"
+    ]
+  },
+  {
+    "model_name": "happyhorse-1.0-r2v-1080p",
+    "family_name": "happyhorse-1.0",
+    "description": "",
+    "icon": "",
+    "tags": "生视频, 参考图片生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-4k",
+    "family_name": "doubao-seedance-2",
+    "description": "4K 分辨率直出。无视频参考模型，计费方式为 (生成视频时长)x【每秒价格】，视频参考模型请调用-video",
+    "icon": "",
+    "tags": "生视频, 图文参考, 首尾帧, 4K",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-video-480p",
+    "family_name": "doubao-seedance-2",
+    "description": "视频参考模型，计费方式为 (参考视频时长+生成视频时长)x【每秒价格】",
+    "icon": "",
+    "tags": "生视频, 视频参考",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan2.7-t2v",
+    "family_name": "wan2.7",
+    "description": "",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan3.0-r2v-720p",
+    "family_name": "wan3.0",
+    "description": "通义万相 3.0 参考生视频 720p",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-5-video-720p",
+    "family_name": "doubao-seedance-2-5",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan3.0-prime-t2v-1080p",
+    "family_name": "wan3.0-prime",
+    "description": "通义万相 3.0 优速版文生视频 1080p",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "eleven_music_v1",
+    "family_name": "eleven_music_v1",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "music"
+    ]
+  },
+  {
+    "model_name": "indextts2-v1",
+    "family_name": "indextts2-v1",
+    "description": "",
+    "icon": "",
+    "tags": "服务",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "audio"
+    ]
+  },
+  {
+    "model_name": "kling-3.0-omni-1080p-ref-mute",
+    "family_name": "kling-3.0-omni",
+    "description": "Kling 3.0 Omni 多模态视频模型，支持参考输入；分辨率、参考模式和音频能力由具体模型变体决定。",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "zzdh-Minimax-h3-720p",
+    "family_name": "zzdh-Minimax-h3",
+    "description": "Minimax H3 视频生成模型（720P 档），支持文生视频、首帧/首尾帧生视频、参考生视频，生成结果原生自带音轨。时长 5~15 秒可调，按秒计费：费用 =（生成视频秒数）×（每秒价格）。",
+    "icon": "",
+    "tags": "生视频, 文生视频, 首尾帧, 参考生, 带音轨",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "字字世界模型pro",
+    "family_name": "字字世界模型pro",
+    "description": "",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "qwen-flash-character",
+    "family_name": "qwen-flash-character",
+    "description": "千问系列多语言角色扮演模型，适合拟人化的角色扮演，同时优化了限定人设指令遵循、话题推进、倾听共情等能力，支持个性化角色的深度还原。",
+    "icon": "",
+    "tags": "生文, 大语言模型, 角色扮演",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai"
+    ]
+  },
+  {
+    "model_name": "zzdh-minimax-h3-限时优惠-文生-480p",
+    "family_name": "zzdh-minimax-h3-限时优惠",
+    "description": "",
+    "icon": "Minimax",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "zzdh-minimax-h3-限时优惠-首尾帧-480p",
+    "family_name": "zzdh-minimax-h3-限时优惠",
+    "description": "",
+    "icon": "Minimax",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "deepseek-v4-pro",
+    "family_name": "deepseek-v4-pro",
+    "description": "",
+    "icon": "",
+    "tags": "生文, 语言模型, 百万上下文",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai",
+      "openai-response"
+    ]
+  },
+  {
+    "model_name": "kling-3.0-omni-1080p-noref-audio",
+    "family_name": "kling-3.0-omni",
+    "description": "Kling 3.0 Omni 多模态视频模型，支持参考输入；分辨率、参考模式和音频能力由具体模型变体决定。",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "qwen-image-3.0-pro-1k",
+    "family_name": "qwen-image-3.0-pro-1k",
+    "description": "千问图像 3.0 Pro 1K。默认 1080p，常用宽高比都可用 aspect_ratio 选择。文生图 0.3 元/张；图生图最多 3 张参考图，每张另计 0.03 元。不要调无后缀的 qwen-image-3.0-pro。",
+    "icon": "",
+    "tags": "生图, 图片参考",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "image-generation"
+    ]
+  },
+  {
+    "model_name": "字字动画去字幕-pro",
+    "family_name": "字字动画去字幕-pro",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "eleven_flash_v2",
+    "family_name": "eleven_flash_v2",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "audio"
+    ]
+  },
+  {
+    "model_name": "Omni-Nano-pro",
+    "family_name": "Omni-Nano-pro",
+    "description": "默认 1K 的高质量图像生成模型，支持参考图生成。",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "image-generation"
+    ]
+  },
+  {
+    "model_name": "qwen-image-2.0",
+    "family_name": "qwen-image-2.0",
+    "description": "",
+    "icon": "",
+    "tags": "生图, 图片参考",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "image-generation"
+    ]
+  },
+  {
+    "model_name": "wan2.2-i2v-plus",
+    "family_name": "wan2.2",
+    "description": "wan2.2-i2v-plus 是由 aliyun-bailian 提供的人工智能模型。计费类型为按秒计费\n480p：0.084元/秒\n1080p：0.42元/秒",
+    "icon": "",
+    "tags": "生视频, 视频生成, 图生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan2.6-i2v-flash",
+    "family_name": "wan2.6",
+    "description": "万相2.6-图生视频-Flash，生成更快更高性价比。智能分镜调度支持多镜头叙事，多人稳定对话，更自然真实音色，最高支持15秒时长生成。计费类型为按秒计费\n720p  0.18元/秒\n1080p 0.3元/秒",
+    "icon": "",
+    "tags": "生视频, 视频生成",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "字字语言模型-O",
+    "family_name": "字字语言模型-O",
+    "description": "",
+    "icon": "",
+    "tags": "生文",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-video-优惠版-1080p",
+    "family_name": "doubao-seedance-2-video-优惠版",
+    "description": "优惠版（价格更低）。视频参考模型，计费方式为 (参考视频时长+生成视频时长)x【每秒价格】",
+    "icon": "",
+    "tags": "生视频, 视频参考, 优惠版",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "happyhorse-1.0-t2v-720p",
+    "family_name": "happyhorse-1.0",
+    "description": "",
+    "icon": "",
+    "tags": "生视频, 文生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "happyhorse-1.0-video-edit-1080p",
+    "family_name": "happyhorse-1.0",
+    "description": "",
+    "icon": "",
+    "tags": "生视频, 视频编辑",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "qwen-vl-max",
+    "family_name": "qwen-vl-max",
+    "description": "qwen-vl-max 是由阿里云百炼提供的人工智能模型，千问VL-Max（qwen-vl-max），即千问超大规模视觉语言模型。相比增强版，再次提升视觉推理能力和指令遵循能力，提供更高的视觉感知和认知水平。在更多复杂任务上提供最佳的性能。",
+    "icon": "",
+    "tags": "生文, 视频理解, 大语言模型",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai"
+    ]
+  },
+  {
+    "model_name": "字字动画视频超分-1080p-专业",
+    "family_name": "字字动画视频超分",
+    "description": "视频超分至 1080p（专业档）：细节增强最强、纹理锐利；输入 ≤30fps、≤300 秒。",
+    "icon": "",
+    "tags": "服务, 视频超分",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "Omni-Nano-pro-vip-2K",
+    "family_name": "Omni-Nano-pro-vip",
+    "description": "固定 2K 输出档，按实际输入/输出 Token 用量计费，费用不固定。",
+    "icon": "",
+    "tags": "生图",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "image-generation"
+    ]
+  },
+  {
+    "model_name": "qwen-image-3.0-pro-2k",
+    "family_name": "qwen-image-3.0-pro-2k",
+    "description": "千问图像 3.0 Pro 2K。文生图 0.6 元/张；图生图最多 3 张参考图，每张另计 0.03 元。不要调无后缀的 qwen-image-3.0-pro。",
+    "icon": "",
+    "tags": "生图, 图片参考",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "image-generation"
+    ]
+  },
+  {
+    "model_name": "vidu-q3-turbo-1080p",
+    "family_name": "vidu-q3-turbo",
+    "description": "",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "zzdh-Minimax-h3-1080p",
+    "family_name": "zzdh-Minimax-h3",
+    "description": "Minimax H3 视频生成模型（1080P 档），支持文生视频、首帧/首尾帧生视频、参考生视频，生成结果原生自带音轨。时长 5~15 秒可调，按秒计费：费用 =（生成视频秒数）×（每秒价格）。",
+    "icon": "",
+    "tags": "生视频, 文生视频, 首尾帧, 参考生, 带音轨",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "字字动画视频超分-720p",
+    "family_name": "字字动画视频超分",
+    "description": "视频超分至 720p（极速档）：保守增强、速度最快，适合批量处理；输入 ≤30fps、≤600 秒。",
+    "icon": "",
+    "tags": "服务, 视频超分",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "eleven_turbo_v2_5",
+    "family_name": "eleven_turbo_v2_5",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "audio"
+    ]
+  },
+  {
+    "model_name": "Omni-Nano-pro-1K",
+    "family_name": "Omni-Nano-pro-1K",
+    "description": "固定 1K 输出档，支持文生图与参考图生成。",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "image-generation"
+    ]
+  },
+  {
+    "model_name": "字字3D",
+    "family_name": "字字3D",
+    "description": "",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-video-720p",
+    "family_name": "doubao-seedance-2",
+    "description": "视频参考模型，计费方式为 (参考视频时长+生成视频时长)x【每秒价格】",
+    "icon": "",
+    "tags": "生视频, 视频参考",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "qwen-image-3.0",
+    "family_name": "qwen-image-3.0",
+    "description": "千问图像 3.0 标准版。文生图 0.3 元/张；图生图最多 3 张参考图，每张另计 0.03 元。",
+    "icon": "",
+    "tags": "生图, 图片参考",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "image-generation"
+    ]
+  },
+  {
+    "model_name": "qwen3.5-plus",
+    "family_name": "qwen3.5-plus",
+    "description": "Qwen3.5 Plus 是由阿里云百炼提供的人工智能模型。",
+    "icon": "",
+    "tags": "生文, 推理, 大语言模型, 阶梯计费",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai"
+    ]
+  },
+  {
+    "model_name": "vidu-q3-turbo-720p",
+    "family_name": "vidu-q3-turbo",
+    "description": "",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan3.0-prime-t2v-480p",
+    "family_name": "wan3.0-prime",
+    "description": "通义万相 3.0 优速版文生视频 480p",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "z-image-turbo",
+    "family_name": "z-image-turbo",
+    "description": "Z Image Turbo 是由 阿里云百炼提供的人工智能模型。",
+    "icon": "import { Bailian } from '@lobehub/icons';",
+    "tags": "生图, 图片生成",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "image-generation"
+    ]
+  },
+  {
+    "model_name": "zzdh-minimax-h3-限时优惠-多图多音频-480p",
+    "family_name": "zzdh-minimax-h3-限时优惠",
+    "description": "",
+    "icon": "Minimax",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-5-video-480p",
+    "family_name": "doubao-seedance-2-5",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "doubao-seedance-2-5-480p",
+    "family_name": "doubao-seedance-2-5",
+    "description": "",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan2.6-t2i",
+    "family_name": "wan2.6-t2i",
+    "description": "阿里通义千问的生图模型",
+    "icon": "",
+    "tags": "生视频, 图片生成",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "kling-3.0-omni-1080p-ref-audio",
+    "family_name": "kling-3.0-omni",
+    "description": "Kling 3.0 Omni 多模态视频模型，支持参考输入；分辨率、参考模式和音频能力由具体模型变体决定。",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "music-2.6-free",
+    "family_name": "music-2.6-free",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "music"
+    ]
+  },
+  {
+    "model_name": "vidu-q3-pro-720p-offpeak",
+    "family_name": "vidu-q3-pro",
+    "description": "",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "xiaomi/mimo-v2.5-pro",
+    "family_name": "xiaomi/mimo-v2.5-pro",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai"
+    ]
+  },
+  {
+    "model_name": "字字动画视频超分-720p-高级",
+    "family_name": "字字动画视频超分",
+    "description": "视频超分至 720p（高级档）：大模型重绘、精修感最强；输入 ≤30fps、≤300 秒。",
+    "icon": "",
+    "tags": "服务, 视频超分",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "eleven_turbo_v2",
+    "family_name": "eleven_turbo_v2",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "audio"
+    ]
+  },
+  {
+    "model_name": "zzdh-minimax-h3-限时优惠-对口型-480p",
+    "family_name": "zzdh-minimax-h3-限时优惠",
+    "description": "",
+    "icon": "Minimax",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "zzdh-minimax-h3-限时优惠-首尾帧-768p",
+    "family_name": "zzdh-minimax-h3-限时优惠",
+    "description": "",
+    "icon": "Minimax",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "字字动画视频超分-2k-高帧率",
+    "family_name": "字字动画视频超分",
+    "description": "视频超分至 2K（极速-高帧率档）：支持 30~60fps 高帧率输入；≤300 秒。",
+    "icon": "",
+    "tags": "服务, 视频超分",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "deepseek-v4-flash",
+    "family_name": "deepseek-v4-flash",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai",
+      "openai-response"
+    ]
+  },
+  {
+    "model_name": "kimi-k3",
+    "family_name": "kimi-k3",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai"
+    ]
+  },
+  {
+    "model_name": "wan2.6-image",
+    "family_name": "wan2.6-image",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "kling-3.0-omni-720p-ref-mute",
+    "family_name": "kling-3.0-omni",
+    "description": "Kling 3.0 Omni 多模态视频模型，支持参考输入；分辨率、参考模式和音频能力由具体模型变体决定。",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "wan2.7-r2v",
+    "family_name": "wan2.7",
+    "description": "",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "zzdh-Minimax-h3-4k",
+    "family_name": "zzdh-Minimax-h3",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "字字动画视频超分-1080p-高级",
+    "family_name": "字字动画视频超分",
+    "description": "视频超分至 1080p（高级档）：大模型重绘、精修感最强；输入 ≤30fps、≤300 秒。",
+    "icon": "",
+    "tags": "服务, 视频超分",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "eleven_text_to_sound_v2",
+    "family_name": "eleven_text_to_sound_v2",
+    "description": "",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai"
+    ]
+  },
+  {
+    "model_name": "kling-v3-omni",
+    "family_name": "kling-3.0-omni",
+    "description": "Kling 3.0 Omni 多模态视频模型，支持参考输入；分辨率、参考模式和音频能力由具体模型变体决定。",
+    "icon": "import { Kling } from '@lobehub/icons';",
+    "tags": "生视频, 视频生成",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "Omni-Nano-pro-2K",
+    "family_name": "Omni-Nano-pro",
+    "description": "固定 2K 输出档，支持文生图与参考图生成。",
+    "icon": "",
+    "tags": "",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "image-generation"
+    ]
+  },
+  {
+    "model_name": "Omni-Nano-pro-vip-1K",
+    "family_name": "Omni-Nano-pro-vip-1K",
+    "description": "固定 1K 输出档，按实际输入/输出 Token 用量计费，费用不固定。",
+    "icon": "",
+    "tags": "生图",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "image-generation"
+    ]
+  },
+  {
+    "model_name": "字字动画视频超分-2k",
+    "family_name": "字字动画视频超分",
+    "description": "视频超分至 2K（极速档）：保守增强、速度最快，适合批量处理；输入 ≤30fps、≤300 秒。",
+    "icon": "",
+    "tags": "服务, 视频超分",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  },
+  {
+    "model_name": "vidu-q3-turbo-540p",
+    "family_name": "vidu-q3-turbo",
+    "description": "",
+    "icon": "",
+    "tags": "生视频",
+    "owner_by": "",
+    "supported_endpoint_types": [
+      "openai-video"
+    ]
+  }
+]

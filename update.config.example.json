@@ -1,0 +1,12 @@
+{
+  "repository": "xinlongfei12138/canvas_shumu",
+  "branch": "main",
+  "releaseApi": "https://api.github.com",
+  "preserve": [
+    "web/node_modules",
+    "canvas-agent/node_modules",
+    "canvas-proxy/node_modules",
+    "data",
+    ".update-config.json"
+  ]
+}
