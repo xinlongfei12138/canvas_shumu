@@ -5,6 +5,8 @@ description: Implemented changes that still need manual verification
 
 # Pending Tests
 
+- Shafu `SD-720p-933`: submit with a reference image and confirm the request still includes the image reference but omits `face_processing`, avoiding the `unsupported video field: face_processing` rejection. Other Shafu video models should keep their existing `face_processing` behavior.
+
 - Shafu video duration fix: verify every fetched Shafu video model, including SD, SDF, Seedance 2.5, and other server-returned models, submits JSON with numeric `duration`. Local image, video, and audio references should be converted to Data URLs and use `input_reference` / `images`, `reference_videos`, and `reference_audios`; public URLs should remain unchanged, and local plus public references should work in the same request without falling back to multipart form fields.
 
 - Shafu images: refresh the model list and confirm Banana/GPT Image models appear under image capability while Seedance models remain video. Verify Banana/GPT Image text-to-image submits JSON to `/v1/videos` and polls `/v1/videos/{task_id}`, multi-image editing sends public `images`, and unified image models submit `/v1/images/generations` then poll `/v1/tasks/{task_id}`. Confirm completed URL, Base64, and `file_id` results are imported into the canvas locally; unified image editing should show the documented-schema warning because the supplied unified document does not define image-edit fields.

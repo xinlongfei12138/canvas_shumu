@@ -364,20 +364,21 @@ async function createShafuVideoTask(config: ShafuRequestConfig, model: string, p
 
 async function createUnifiedShafuVideoTask(config: ShafuRequestConfig, model: string, prompt: string, references: ReferenceImage[], options?: VideoMediaOptions): Promise<VideoGenerationTask> {
     if (!prompt.trim()) throw new Error(apiText("videoPromptRequired"));
+    const modelName = modelOptionName(model);
     const videos = options?.videos || [];
     const audios = options?.audios || [];
     const duration = Number(rawVideoSeconds(config.videoSeconds));
     const aspectRatio = videoAspectRatio(config.size);
     const size = normalizeVideoSize(config.size, config.vquality);
     const referenceMode = references.length && resolveVideoMode(config.videoMode, references.length) === "frames" ? "frame" : "image";
-    validateShafuVideoRequest(config, modelOptionName(model), prompt, duration, aspectRatio, referenceMode, references.length, videos.length, audios.length);
+    validateShafuVideoRequest(config, modelName, prompt, duration, aspectRatio, referenceMode, references.length, videos.length, audios.length);
     if (references.length && config.providerCapabilities?.supportsImageInput === false) throw new Error(providerText("shafuImageInputUnsupported"));
 
     const { images, videoValues, audioValues } = await resolveShafuReferenceValues(references, videos, audios, options);
 
     const requestId = `canvas-${nanoid()}`;
     const fields = {
-        model: modelOptionName(model),
+        model: modelName,
         prompt: prompt.trim(),
         // DOC 03 / VIDEO uses a numeric duration. A string can make the
         // NewAPI adapter fail while decoding its Alias.duration field.
@@ -387,7 +388,7 @@ async function createUnifiedShafuVideoTask(config: ShafuRequestConfig, model: st
         generate_audio: boolConfig(config.videoGenerateAudio, false),
         reference_mode: referenceMode,
         ...(config.videoNegativePrompt.trim() ? { negative_prompt: config.videoNegativePrompt.trim() } : {}),
-        face_processing: boolConfig(config.videoFaceProcessing, false),
+        ...shafuFaceProcessingField(modelName, config.videoFaceProcessing),
         idempotency_key: requestId,
     };
     const body: Record<string, unknown> = {
@@ -428,7 +429,7 @@ async function createLegacyShafuVideoTask(config: AiConfig, model: string, promp
         generate_audio: boolConfig(config.videoGenerateAudio, false),
         reference_mode: referenceMode,
         ...(config.videoNegativePrompt.trim() ? { negative_prompt: config.videoNegativePrompt.trim() } : {}),
-        face_processing: boolConfig(config.videoFaceProcessing, false),
+        ...shafuFaceProcessingField(modelName, config.videoFaceProcessing),
         idempotency_key: `canvas-${nanoid()}`,
     };
 
@@ -545,6 +546,10 @@ function findMediaFileId(payload: unknown): string {
 function validateShafuImage(file: File) {
     if (file.size > 24 * 1024 * 1024) throw new Error(i18n.t("providerErrors.shafuImageTooLarge", { name: file.name }));
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type.toLowerCase())) throw new Error(i18n.t("providerErrors.shafuImageFormatUnsupported", { name: file.name }));
+}
+
+function shafuFaceProcessingField(model: string, enabled: string) {
+    return /^sd-720p-933$/i.test(model.trim()) ? {} : { face_processing: boolConfig(enabled, false) };
 }
 
 async function resolveShafuReferenceValues(references: ReferenceImage[], videos: ReferenceVideo[], audios: ReferenceAudio[], options?: RequestOptions) {
