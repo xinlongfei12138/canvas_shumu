@@ -54,7 +54,7 @@ export function ModelSelectModal({ open, channel, onConfirm, onClose }: { open: 
     const addManual = () => {
         const name = manual.trim();
         if (!name) return;
-        if (![...fetched, ...existing].some((model) => model.name === name)) setFetched((current) => [{ name, capability: channel?.apiFormat === "shafu" ? "video" : guessCapability(name) }, ...current]);
+        if (![...fetched, ...existing].some((model) => model.name === name)) setFetched((current) => [{ name, capability: guessCapability(name) }, ...current]);
         setSelected((current) => new Set(current).add(name));
         setManual("");
         setActiveTab("new");

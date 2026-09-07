@@ -442,7 +442,7 @@ function apiFormatLabel(apiFormat: ApiCallFormat) {
     if (apiFormat === "zizidonghua") return "字字动画";
     if (apiFormat === "autodl") return "AutoDL ComfyUI";
     if (apiFormat === "canvasvideo") return "Canvas 开放视频 API";
-    if (apiFormat === "shafu") return "Shafu 视频";
+    if (apiFormat === "shafu") return "Shafu 多协议";
     return "OpenAI";
 }
 

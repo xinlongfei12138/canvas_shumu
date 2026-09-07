@@ -73,7 +73,7 @@ export default {
         canvasVideoModelListUnsupported: "Canvas 开放视频 API 未提供模型列表接口，请手动添加视频模型 ID",
         canvasVideoMixedReferencesUnsupported: "Canvas 开放视频 API 尚未提供本地文件与公网 URL 混合提交协议；请将本次参考素材全部改为本地文件或全部改为公网 URL，未发送请求",
         canvasVideoRefunded: "{{message}}；已自动退款 ¥{{amount}}",
-        shafuCapabilityUnsupported: "Shafu 视频渠道只支持视频生成，不支持{{capability}}生成",
+        shafuCapabilityUnsupported: "Shafu 渠道当前不支持{{capability}}生成", shafuUnifiedImageEditUnsupported: "Shafu 统一图片协议文档未提供图生图字段；已确认的 Banana/GPT Image 模型可使用图生图",
         shafuUnifiedReferenceMediaUnsupported: "Shafu 统一视频协议没有确认参考视频或参考音频字段，未发送请求",
         shafuImageInputUnsupported: "当前 Shafu 模型未声明支持参考图片，未发送请求",
         shafuUnifiedImageFieldUnknown: "当前 Shafu 模型虽声明支持参考图片，但文档未确认应使用 image、images 还是 input_reference，未发送请求",

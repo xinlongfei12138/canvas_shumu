@@ -4,7 +4,9 @@
 
 - [新增] 增加 Windows 本地启动器与 GitHub Release 源码更新脚本，更新时保留本地配置目录。
 - [调整] 界面 GitHub 入口改为当前维护仓库，并移除顶部文档入口。
-+ [调整] Shafu 视频渠道改为按官方 `/v1/models` 动态读取账号可用的视频模型及 `capabilities`，不再内置或锁死 5 个模型、清晰度和时长；统一协议任务使用 `/v1/tasks/{task_id}` 轮询，旧 Seedance 模型继续保留兼容调用。
+- [调整] Shafu 多协议渠道按官方 `/v1/models` 动态保留图片、视频和其他模型，并根据 capabilities 与官方模型 ID 分类；不再把整个渠道强制标记为视频。
+- [新增] Shafu Banana/GPT Image 图片模型接入旧版 `/v1/videos` 异步生图与多图生图，统一协议图片模型接入 `/v1/images/generations`、`/v1/tasks/{task_id}` 轮询及 `file_id` 媒体下载。
+- [修复] Shafu 视频提交统一使用数字 `duration`，并按文档发送 `input_reference` / `images`、multipart `image`、参考视频和参考音频，避免字符串时长触发 NewAPI `Alias.duration` 解码错误。
 
 ## v0.18.0 - 2026-09-05
 

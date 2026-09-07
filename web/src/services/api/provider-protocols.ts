@@ -52,11 +52,11 @@ export function providerApiUrl(baseUrl: string, path: string) {
 }
 
 export function textApiPath(apiFormat: ApiCallFormat) {
-    return apiFormat === "zizidonghua" ? "/v1/chat/completions" : "/chat/completions";
+    return apiFormat === "zizidonghua" || apiFormat === "shafu" ? "/v1/chat/completions" : "/chat/completions";
 }
 
 export function imageApiPath(apiFormat: ApiCallFormat) {
-    return apiFormat === "zizidonghua" ? "/v1/images/generations" : "/images/generations";
+    return apiFormat === "zizidonghua" || apiFormat === "shafu" ? "/v1/images/generations" : "/images/generations";
 }
 
 export function autoDlVideoSecondsRange(model: string) {

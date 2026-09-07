@@ -73,7 +73,7 @@ export default {
         canvasVideoModelListUnsupported: "Canvas Open Video API has no documented model-list endpoint. Add the video model ID manually.",
         canvasVideoMixedReferencesUnsupported: "Canvas Open Video API does not document mixed local-file and public-URL submissions. Use all local files or all public URLs for this request; no request was sent.",
         canvasVideoRefunded: "{{message}}; ¥{{amount}} was refunded automatically",
-        shafuCapabilityUnsupported: "Shafu video supports video generation only, not {{capability}} generation",
+        shafuCapabilityUnsupported: "The Shafu channel does not currently support {{capability}} generation", shafuUnifiedImageEditUnsupported: "Shafu's unified image documentation does not define image-edit fields; use a documented Banana/GPT Image model for image-to-image",
         shafuUnifiedReferenceMediaUnsupported: "Shafu's unified video protocol does not document reference-video or reference-audio fields; no request was sent",
         shafuImageInputUnsupported: "The selected Shafu model does not declare image input support; no request was sent",
         shafuUnifiedImageFieldUnknown: "The selected Shafu model declares image input, but its documentation does not identify image, images, or input_reference; no request was sent",

@@ -80,6 +80,11 @@ type ChatCompletionPayload = {
 type ChatCompletionStreamState = { buffer: string; text: string; error?: string };
 
 type ImageApiResponse = {
+    id?: string;
+    task_id?: string;
+    taskId?: string;
+    status?: string;
+    object?: string;
     data?: Array<Record<string, unknown>>;
     error?: { message?: string };
     code?: number;
@@ -249,18 +254,40 @@ function resolveImageSource(item: Record<string, unknown>) {
     if (typeof item.url === "string" && item.url) {
         return item.url;
     }
+    if (typeof item.image_url === "string" && item.image_url) return item.image_url;
+    if (isRecord(item.image_url) && typeof item.image_url.url === "string" && item.image_url.url) return item.image_url.url;
+    if (typeof item.file_url === "string" && item.file_url) return item.file_url;
+    if (typeof item.result_url === "string" && item.result_url) return item.result_url;
+    if (typeof item.output_url === "string" && item.output_url) return item.output_url;
     return null;
 }
 
-function parseImagePayload(payload: ImageApiResponse) {
+function imageItemsFromPayload(payload: unknown): Array<Record<string, unknown>> {
+    if (!isRecord(payload)) return [];
+    if (resolveImageSource(payload) || typeof payload.file_id === "string" || typeof payload.fileId === "string") return [payload];
+    const candidates = [payload.data, payload.images, payload.results, payload.output, payload.result, payload.metadata, payload.content];
+    for (const value of candidates) {
+        if (Array.isArray(value)) return value.flatMap((item) => isRecord(item) ? [item] : typeof item === "string" && item ? [{ url: item }] : []);
+        if (typeof value === "string" && value) return [{ url: value }];
+        if (isRecord(value)) {
+            const nested = imageItemsFromPayload(value);
+            if (nested.length) return nested;
+        }
+    }
+    return [];
+}
+
+function parseImagePayload(payload: ImageApiResponse | unknown) {
+    if (!isRecord(payload)) throw new Error(apiText("noImageReturned"));
     if (typeof payload.code === "number" && payload.code !== 0) {
-        throw new Error(payload.msg || apiText("requestFailed"));
+        throw new Error(readApiErrorMessage(payload) || apiText("requestFailed"));
+    }
+    if (payload.error) {
+        const message = readApiErrorMessage(payload);
+        if (message) throw new Error(message);
     }
     // Support data, images, and results response fields used by different APIs.
-    const imageList = payload.data
-        || (payload as Record<string, unknown>).images as Array<Record<string, unknown>> | undefined
-        || (payload as Record<string, unknown>).results as Array<Record<string, unknown>> | undefined
-        || [];
+    const imageList = imageItemsFromPayload(payload);
     const images = imageList
         .map(resolveImageSource)
         .filter((value): value is string => Boolean(value))
@@ -275,6 +302,142 @@ function parseImagePayload(payload: ImageApiResponse) {
     }
 
     return images;
+}
+
+function shafuImageModelUsesLegacyVideo(model: string) {
+    const value = model.trim().toLowerCase();
+    return value.includes("nano-banana") || /gpt-image2(?:-|$)/i.test(value) || /gpt-image-2(?:-|$)/i.test(value);
+}
+
+function shafuImageAspectRatio(size: string) {
+    const value = size.trim();
+    if (/^\d+:\d+$/.test(value)) return value;
+    const dimensions = parseImageDimensions(value);
+    return dimensions ? `${dimensions.width}:${dimensions.height}` : "1:1";
+}
+
+function shafuTaskId(payload: unknown) {
+    if (!isRecord(payload)) return "";
+    const data = isRecord(payload.data) ? payload.data : undefined;
+    const error = isRecord(payload.error) ? payload.error : undefined;
+    return [payload.id, payload.task_id, payload.taskId, data?.id, data?.task_id, data?.taskId, error?.task_id, error?.taskId]
+        .find((value) => typeof value === "string" && value.trim()) as string || "";
+}
+
+function shafuTaskStatus(payload: unknown) {
+    if (!isRecord(payload)) return "";
+    const data = isRecord(payload.data) ? payload.data : undefined;
+    return String(payload.status || data?.status || "").trim().toLowerCase();
+}
+
+function shafuImageCompleted(status: string) {
+    return ["completed", "succeeded", "success", "done"].includes(status);
+}
+
+function shafuImageFailed(status: string) {
+    return ["failed", "cancelled", "canceled", "error"].includes(status);
+}
+
+async function resolveShafuImageFile(config: AiConfig, item: Record<string, unknown>, options?: RequestOptions) {
+    const source = resolveImageSource(item);
+    if (source) return source;
+    const fileId = [item.file_id, item.fileId].find((value) => typeof value === "string" && value) as string | undefined;
+    if (!fileId) return null;
+    const url = providerApiUrl(config.baseUrl, `/v1/files/${encodeURIComponent(fileId)}/content`);
+    const response = await axios.get<Blob>(url, { headers: aiHeaders(config), responseType: "blob", signal: options?.signal });
+    return blobToDataUrl(response.data);
+}
+
+async function parseShafuImageResult(config: AiConfig, payload: unknown, options?: RequestOptions) {
+    const images = imageItemsFromPayload(payload);
+    const sources = await Promise.all(images.map((item) => resolveShafuImageFile(config, item, options)));
+    return sources.filter((value): value is string => Boolean(value)).map((dataUrl) => ({ id: nanoid(), dataUrl }));
+}
+
+async function pollShafuImageTask(config: AiConfig, taskId: string, legacy: boolean, options?: RequestOptions) {
+    const path = legacy ? `/v1/videos/${encodeURIComponent(taskId)}` : `/v1/tasks/${encodeURIComponent(taskId)}`;
+    for (;;) {
+        const payload = (await axios.get<unknown>(providerApiUrl(config.baseUrl, path), { headers: aiHeaders(config), signal: options?.signal })).data;
+        const status = shafuTaskStatus(payload);
+        if (shafuImageFailed(status)) throw new Error(readApiErrorMessage(payload) || apiText("requestFailed"));
+        if (shafuImageCompleted(status)) {
+            const images = await parseShafuImageResult(config, payload, options);
+            if (images.length) return images;
+            throw new Error(apiText("noImageReturned"));
+        }
+        await delay(2500, options?.signal);
+    }
+}
+
+async function requestShafuLegacyImages(config: AiConfig, prompt: string, references: ReferenceImage[], count: number, options?: RequestOptions) {
+    const urls = await Promise.all(references.map((image) => resolvePublicReferenceImage(image, config, options?.signal)));
+    const requests = Array.from({ length: count }, async () => {
+        const payload = (await axios.post<unknown>(
+            providerApiUrl(config.baseUrl, "/v1/videos"),
+            {
+                model: config.model,
+                prompt: withSystemPrompt(config, prompt),
+                aspect_ratio: shafuImageAspectRatio(config.size),
+                ...(urls.length ? { images: urls } : {}),
+            },
+            { headers: aiHeaders(config, "application/json"), signal: options?.signal },
+        )).data;
+        const immediate = await parseShafuImageResult(config, payload, options);
+        if (immediate.length) return immediate;
+        const taskId = shafuTaskId(payload);
+        if (!taskId) throw new Error(readApiErrorMessage(payload) || apiText("noImageReturned"));
+        return pollShafuImageTask(config, taskId, true, options);
+    });
+    return (await Promise.all(requests)).flat();
+}
+
+async function requestShafuUnifiedImages(config: AiConfig, prompt: string, references: ReferenceImage[], count: number, options?: RequestOptions) {
+    if (references.length) throw new Error(apiText("shafuUnifiedImageEditUnsupported"));
+    const requestSize = resolveRequestSize(normalizeQuality(config.quality), config.size);
+    const payload = (await axios.post<unknown>(
+        providerApiUrl(config.baseUrl, "/v1/images/generations"),
+        {
+            model: config.model,
+            prompt: withSystemPrompt(config, prompt),
+            ...(requestSize ? { size: requestSize } : {}),
+            n: count,
+            response_format: "url",
+        },
+        { headers: { ...aiHeaders(config, "application/json"), Prefer: "respond-async", "Idempotency-Key": `canvas-${nanoid()}` }, signal: options?.signal },
+    )).data;
+    const immediate = await parseShafuImageResult(config, payload, options);
+    if (immediate.length) return immediate;
+    const taskId = shafuTaskId(payload);
+    if (!taskId) throw new Error(readApiErrorMessage(payload) || apiText("noImageReturned"));
+    return pollShafuImageTask(config, taskId, false, options);
+}
+
+async function requestShafuImages(config: AiConfig, prompt: string, references: ReferenceImage[], count: number, options?: RequestOptions) {
+    return shafuImageModelUsesLegacyVideo(config.model)
+        ? requestShafuLegacyImages(config, prompt, references, count, options)
+        : requestShafuUnifiedImages(config, prompt, references, count, options);
+}
+
+function delay(ms: number, signal?: AbortSignal) {
+    return new Promise<void>((resolve, reject) => {
+        if (signal?.aborted) {
+            reject(signal.reason instanceof Error ? signal.reason : new DOMException("Aborted", "AbortError"));
+            return;
+        }
+        const done = () => { signal?.removeEventListener("abort", abort); resolve(); };
+        const abort = () => { window.clearTimeout(timer); reject(signal?.reason instanceof Error ? signal.reason : new DOMException("Aborted", "AbortError")); };
+        const timer = window.setTimeout(done, ms);
+        signal?.addEventListener("abort", abort, { once: true });
+    });
+}
+
+function blobToDataUrl(blob: Blob) {
+    return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = () => reject(reader.error || new Error(apiText("requestFailed")));
+        reader.readAsDataURL(blob);
+    });
 }
 
 function readApiErrorMessage(value: unknown): string {
@@ -803,7 +966,6 @@ function parseGeminiImagePayload(payload: GeminiPayload) {
 export async function requestGeneration(config: AiConfig, prompt: string, options?: RequestOptions) {
     const requestConfig = resolveModelRequestConfig(config, config.model || config.imageModel);
     if (requestConfig.apiFormat === "canvasvideo") throw new Error(i18n.t("providerErrors.canvasVideoCapabilityUnsupported", { capability: apiText("capabilityImage") }));
-    if (requestConfig.apiFormat === "shafu") throw new Error(i18n.t("providerErrors.shafuCapabilityUnsupported", { capability: apiText("capabilityImage") }));
     const n = Math.max(1, Math.min(15, Math.floor(Math.abs(Number(config.count)) || 1)));
     const script = resolveModelScript(config, config.model || config.imageModel);
     if (script) {
@@ -828,6 +990,13 @@ export async function requestGeneration(config: AiConfig, prompt: string, option
     if (requestConfig.apiFormat === "gemini") {
         try {
             return await requestGeminiImages(requestConfig, prompt, [], n, options);
+        } catch (error) {
+            throw new Error(readAxiosError(error, apiText("requestFailed")));
+        }
+    }
+    if (requestConfig.apiFormat === "shafu") {
+        try {
+            return await requestShafuImages(requestConfig, prompt, [], n, options);
         } catch (error) {
             throw new Error(readAxiosError(error, apiText("requestFailed")));
         }
@@ -893,7 +1062,6 @@ export async function requestGeneration(config: AiConfig, prompt: string, option
 export async function requestEdit(config: AiConfig, prompt: string, references: ReferenceImage[], options?: RequestOptions) {
     const requestConfig = resolveModelRequestConfig(config, config.model || config.imageModel);
     if (requestConfig.apiFormat === "canvasvideo") throw new Error(i18n.t("providerErrors.canvasVideoCapabilityUnsupported", { capability: apiText("capabilityImage") }));
-    if (requestConfig.apiFormat === "shafu") throw new Error(i18n.t("providerErrors.shafuCapabilityUnsupported", { capability: apiText("capabilityImage") }));
     const n = Math.max(1, Math.min(15, Math.floor(Math.abs(Number(config.count)) || 1)));
     const requestPrompt = buildImageReferencePromptText(prompt, references);
     const script = resolveModelScript(config, config.model || config.imageModel);
@@ -920,6 +1088,13 @@ export async function requestEdit(config: AiConfig, prompt: string, references: 
     if (requestConfig.apiFormat === "gemini") {
         try {
             return await requestGeminiImages(requestConfig, requestPrompt, references, n, options);
+        } catch (error) {
+            throw new Error(readAxiosError(error, apiText("requestFailed")));
+        }
+    }
+    if (requestConfig.apiFormat === "shafu") {
+        try {
+            return await requestShafuImages(requestConfig, requestPrompt, references, n, options);
         } catch (error) {
             throw new Error(readAxiosError(error, apiText("requestFailed")));
         }
@@ -987,7 +1162,6 @@ export async function requestEdit(config: AiConfig, prompt: string, references: 
 export async function requestImageQuestion(config: AiConfig, messages: AiTextMessage[], onDelta: (text: string) => void, options?: RequestOptions) {
     const requestConfig = resolveModelRequestConfig(config, config.model || config.textModel);
     if (requestConfig.apiFormat === "canvasvideo") throw new Error(i18n.t("providerErrors.canvasVideoCapabilityUnsupported", { capability: apiText("capabilityText") }));
-    if (requestConfig.apiFormat === "shafu") throw new Error(i18n.t("providerErrors.shafuCapabilityUnsupported", { capability: apiText("capabilityText") }));
     const script = resolveModelScript(config, config.model || config.textModel);
     if (script) {
         try {
@@ -1013,7 +1187,7 @@ export async function requestImageQuestion(config: AiConfig, messages: AiTextMes
             if (answer === apiText("noContent")) onDelta(answer);
             return answer;
         }
-        if (requestConfig.apiFormat === "volcengine" || requestConfig.apiFormat === "zizidonghua") {
+        if (requestConfig.apiFormat === "volcengine" || requestConfig.apiFormat === "zizidonghua" || requestConfig.apiFormat === "shafu") {
             const answer = (await requestStreamingChatCompletion(requestConfig, messages, onDelta, options)).content || apiText("noContent");
             if (answer === apiText("noContent")) onDelta(answer);
             return answer;
@@ -1059,20 +1233,20 @@ export async function fetchImageModels(config: Pick<AiConfig, "baseUrl" | "apiKe
 }
 
 export async function fetchChannelModels(channel: ModelChannel) {
-    if (channel.apiFormat === "shafu") return fetchShafuVideoModels(channel);
+    if (channel.apiFormat === "shafu") return fetchShafuModels(channel);
     return (await fetchImageModels({ baseUrl: channel.baseUrl, apiKey: channel.apiKey, apiFormat: channel.apiFormat })).map((name) => ({ name, capability: guessCapability(name) }));
 }
 
-async function fetchShafuVideoModels(channel: ModelChannel): Promise<ChannelModel[]> {
+async function fetchShafuModels(channel: ModelChannel): Promise<ChannelModel[]> {
     try {
         const response = await axios.get<unknown>(providerApiUrl(channel.baseUrl, "/v1/models"), {
             headers: { Authorization: `Bearer ${channel.apiKey}` },
         });
-        // Shafu accounts may expose models without a populated capabilities.type.
-        // Keep every identified model so provider-side model configuration remains authoritative.
+        // Preserve all models. SHAFU exposes image and video models from the same
+        // endpoint, and older records may omit the capabilities object.
         return shafuModelList(response.data)
             .filter((model) => Boolean(model.id?.trim()))
-            .map((model) => ({ name: model.id!.trim(), capability: "video" as const, providerCapabilities: toProviderCapabilities(model.capabilities) }))
+            .map((model) => ({ name: model.id!.trim(), capability: shafuModelCapability(model), providerCapabilities: toProviderCapabilities(model.capabilities) }))
             .sort((a, b) => a.name.localeCompare(b.name));
     } catch (error) {
         throw new Error(readAxiosError(error, apiText("modelReadFailed")));
@@ -1081,6 +1255,7 @@ async function fetchShafuVideoModels(channel: ModelChannel): Promise<ChannelMode
 
 type ShafuModel = {
     id?: string;
+    supported_endpoint_types?: unknown;
     capabilities?: {
         type?: string;
         endpoints?: unknown;
@@ -1108,6 +1283,18 @@ function shafuModelList(payload: unknown): ShafuModel[] {
 
 function isShafuModel(value: unknown): value is ShafuModel {
     return Boolean(value && typeof value === "object" && typeof (value as Record<string, unknown>).id === "string");
+}
+
+function shafuModelCapability(model: ShafuModel): ChannelModel["capability"] {
+    const capabilitiesType = typeof model.capabilities?.type === "string" ? model.capabilities.type.toLowerCase() : "";
+    if (capabilitiesType === "video") return "video";
+    if (capabilitiesType === "image") return "image";
+    const endpoints = Array.isArray(model.supported_endpoint_types) ? model.supported_endpoint_types : [];
+    if (endpoints.some((endpoint) => typeof endpoint === "string" && /video/i.test(endpoint))) return "video";
+    const id = model.id || "";
+    if (/^sdf?[-_.]/i.test(id) || /^sd-2\.[025](?:[-_.]|$)/i.test(id)) return "video";
+    if (/(?:nano-banana|gpt-image)/i.test(id)) return "image";
+    return guessCapability(id);
 }
 
 function toProviderCapabilities(value: ShafuModel["capabilities"]): ProviderModelCapabilities {

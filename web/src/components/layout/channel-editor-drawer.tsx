@@ -21,7 +21,7 @@ export function ChannelEditorDrawer({ open, channel, onSave, onClose }: { open: 
         { label: "字字动画", value: "zizidonghua" },
         { label: "AutoDL ComfyUI", value: "autodl" },
         { label: "Canvas 开放视频 API", value: "canvasvideo" },
-        { label: "Shafu 视频", value: "shafu" },
+        { label: "Shafu 多协议", value: "shafu" },
     ];
     const capabilityOptions: Array<{ label: string; value: ModelCapability }> = ["image", "video", "text", "audio"].map((value) => ({ label: t(`config.channelEditor.capabilities.${value}`), value: value as ModelCapability }));
 

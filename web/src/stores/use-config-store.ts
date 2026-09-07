@@ -523,12 +523,21 @@ export function defaultBaseUrlForApiFormat(apiFormat: ApiCallFormat) {
 }
 
 export function isFixedVideoApiFormat(apiFormat: ApiCallFormat) {
-    return apiFormat === "canvasvideo" || apiFormat === "shafu";
+    return apiFormat === "canvasvideo";
 }
 
 export function channelModelsForApiFormat(apiFormat: ApiCallFormat, models?: Array<string | ChannelModel>) {
     const normalized = normalizeChannelModels(models);
-    return apiFormat === "canvasvideo" || apiFormat === "shafu" ? normalized.map((model) => ({ ...model, capability: "video" as const })) : normalized;
+    if (apiFormat === "canvasvideo") return normalized.map((model) => ({ ...model, capability: "video" as const }));
+    if (apiFormat === "shafu") {
+        return normalized.map((model) => {
+            const value = model.name.toLowerCase();
+            if (value.includes("nano-banana") || /gpt-image/.test(value)) return { ...model, capability: "image" as const };
+            if (/^sdf?[-_.]/.test(value) || /^sd-2\.[025](?:[-_.]|$)/.test(value)) return { ...model, capability: "video" as const };
+            return model;
+        });
+    }
+    return normalized;
 }
 
 function normalizeProviderModelCapabilities(value: ProviderModelCapabilities | undefined) {

@@ -366,24 +366,60 @@ async function createUnifiedShafuVideoTask(config: ShafuRequestConfig, model: st
     if (!prompt.trim()) throw new Error(apiText("videoPromptRequired"));
     const videos = options?.videos || [];
     const audios = options?.audios || [];
-    if (videos.length || audios.length) throw new Error(providerText("shafuUnifiedReferenceMediaUnsupported"));
-    if (references.length && config.providerCapabilities?.supportsImageInput !== true) throw new Error(providerText("shafuImageInputUnsupported"));
-    if (references.length) throw new Error(providerText("shafuUnifiedImageFieldUnknown"));
-
     const duration = Number(rawVideoSeconds(config.videoSeconds));
+    const aspectRatio = videoAspectRatio(config.size);
     const size = normalizeVideoSize(config.size, config.vquality);
-    validateUnifiedShafuSpec(config.providerCapabilities, duration, size);
-    const hasDocumentedDurations = Boolean(config.providerCapabilities?.durations?.length);
-    const hasDocumentedSizes = Boolean(config.providerCapabilities?.sizes?.length);
-    const body: Record<string, unknown> = {
+    const referenceMode = references.length && resolveVideoMode(config.videoMode, references.length) === "frames" ? "frame" : "image";
+    validateShafuVideoRequest(config, modelOptionName(model), prompt, duration, aspectRatio, referenceMode, references.length, videos.length, audios.length);
+    if (references.length && config.providerCapabilities?.supportsImageInput === false) throw new Error(providerText("shafuImageInputUnsupported"));
+
+    const publicImages = references.map(publicImageUrl);
+    const publicVideos = videos.map((video) => publicMediaUrl(video.url));
+    const publicAudios = audios.map((audio) => publicMediaUrl(audio.url));
+    const publicCount = [...publicImages, ...publicVideos, ...publicAudios].filter(Boolean).length;
+    const mediaCount = references.length + videos.length + audios.length;
+    if (publicCount > 0 && publicCount < mediaCount) throw new Error(i18n.t("providerErrors.shafuMixedReferencesUnsupported"));
+
+    const requestId = `canvas-${nanoid()}`;
+    const fields = {
         model: modelOptionName(model),
         prompt: prompt.trim(),
-        ...(hasDocumentedDurations ? { seconds: String(duration) } : {}),
-        ...(hasDocumentedSizes && size ? { size } : {}),
+        // DOC 03 / VIDEO uses a numeric duration. A string can make the
+        // NewAPI adapter fail while decoding its Alias.duration field.
+        duration,
+        ...(aspectRatio !== "16:9" || config.size !== "auto" ? { aspect_ratio: aspectRatio } : {}),
+        ...(config.providerCapabilities?.sizes?.length && size ? { size } : {}),
+        generate_audio: boolConfig(config.videoGenerateAudio, false),
+        reference_mode: referenceMode,
+        ...(config.videoNegativePrompt.trim() ? { negative_prompt: config.videoNegativePrompt.trim() } : {}),
+        face_processing: boolConfig(config.videoFaceProcessing, false),
+        idempotency_key: requestId,
     };
+    let body: Record<string, unknown> | FormData;
+    if (publicCount === mediaCount) {
+        body = {
+            ...fields,
+            ...(references.length === 1 && referenceMode === "image" ? { input_reference: publicImages[0] } : references.length ? { images: publicImages } : {}),
+            ...(publicVideos.length ? { reference_videos: publicVideos } : {}),
+            ...(publicAudios.length ? { reference_audios: publicAudios } : {}),
+            metadata: { idempotency_key: requestId },
+        };
+    } else {
+        const imageFiles = await Promise.all(references.map(async (image) => dataUrlToFile({ ...image, dataUrl: await imageToDataUrl(image, options) })));
+        imageFiles.forEach(validateShafuImage);
+        const videoFiles = await Promise.all(videos.map((video) => referenceMediaToFile(video, "reference-video.mp4", "invalidReferenceVideo", options)));
+        const audioFiles = await Promise.all(audios.map((audio) => referenceMediaToFile(audio, "reference-audio.mp3", "invalidReferenceAudio", options)));
+        const form = new FormData();
+        Object.entries(fields).forEach(([key, value]) => form.append(key, String(value)));
+        form.append("metadata", JSON.stringify({ idempotency_key: requestId }));
+        imageFiles.forEach((file) => form.append("image", file, file.name));
+        videoFiles.forEach((file) => form.append("reference_videos", file, file.name));
+        audioFiles.forEach((file) => form.append("reference_audios", file, file.name));
+        body = form;
+    }
     try {
         const payload = (await axios.post<unknown>(providerApiUrl(config.baseUrl, "/v1/videos"), body, {
-            headers: { ...aiHeaders(config, "application/json"), "Idempotency-Key": `canvas-${nanoid()}` },
+            headers: { ...aiHeaders(config, body instanceof FormData ? undefined : "application/json"), "Idempotency-Key": requestId },
             signal: options?.signal,
         })).data;
         const id = taskIdFromPayload(payload);
@@ -460,8 +496,8 @@ async function pollShafuVideoTask(config: AiConfig, task: VideoGenerationTask, o
     try {
         const payload = (await axios.get<unknown>(providerApiUrl(config.baseUrl, `/v1/videos/${encodeURIComponent(task.id)}`), { headers: aiHeaders(config), signal: options?.signal })).data;
         const status = statusFromPayload(payload);
-        if (["failed", "cancelled"].includes(status)) return { status: "failed", error: readApiErrorMessage(payload) || apiText("videoGenerationFailed") };
-        if (status !== "completed") return { status: "pending" };
+        if (["failed", "cancelled", "canceled"].includes(status)) return { status: "failed", error: readApiErrorMessage(payload) || apiText("videoGenerationFailed") };
+        if (!["completed", "succeeded", "success"].includes(status)) return { status: "pending" };
         return { status: "completed", result: await shafuCompletedVideo(config, task, findVideoUrl(payload), options) };
     } catch (error) {
         throw new Error(readAxiosError(error, apiText("videoTaskQueryFailed")));
@@ -472,8 +508,8 @@ async function pollUnifiedShafuVideoTask(config: AiConfig, task: VideoGeneration
     try {
         const payload = (await axios.get<unknown>(providerApiUrl(config.baseUrl, `/v1/tasks/${encodeURIComponent(task.id)}`), { headers: aiHeaders(config), signal: options?.signal })).data;
         const status = statusFromPayload(payload);
-        if (["failed", "cancelled"].includes(status)) return { status: "failed", error: readApiErrorMessage(payload) || apiText("videoGenerationFailed") };
-        if (status !== "completed") return { status: "pending" };
+        if (["failed", "cancelled", "canceled"].includes(status)) return { status: "failed", error: readApiErrorMessage(payload) || apiText("videoGenerationFailed") };
+        if (!["completed", "succeeded", "success"].includes(status)) return { status: "pending" };
         const url = findVideoUrl(payload);
         if (url) return { status: "completed", result: await videoResultFromUrl(url, options) };
         const fileId = findMediaFileId(payload);
