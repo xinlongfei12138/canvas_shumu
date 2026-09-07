@@ -373,12 +373,7 @@ async function createUnifiedShafuVideoTask(config: ShafuRequestConfig, model: st
     validateShafuVideoRequest(config, modelOptionName(model), prompt, duration, aspectRatio, referenceMode, references.length, videos.length, audios.length);
     if (references.length && config.providerCapabilities?.supportsImageInput === false) throw new Error(providerText("shafuImageInputUnsupported"));
 
-    const publicImages = references.map(publicImageUrl);
-    const publicVideos = videos.map((video) => publicMediaUrl(video.url));
-    const publicAudios = audios.map((audio) => publicMediaUrl(audio.url));
-    const publicCount = [...publicImages, ...publicVideos, ...publicAudios].filter(Boolean).length;
-    const mediaCount = references.length + videos.length + audios.length;
-    if (publicCount > 0 && publicCount < mediaCount) throw new Error(i18n.t("providerErrors.shafuMixedReferencesUnsupported"));
+    const { images, videoValues, audioValues } = await resolveShafuReferenceValues(references, videos, audios, options);
 
     const requestId = `canvas-${nanoid()}`;
     const fields = {
@@ -395,31 +390,16 @@ async function createUnifiedShafuVideoTask(config: ShafuRequestConfig, model: st
         face_processing: boolConfig(config.videoFaceProcessing, false),
         idempotency_key: requestId,
     };
-    let body: Record<string, unknown> | FormData;
-    if (publicCount === mediaCount) {
-        body = {
-            ...fields,
-            ...(references.length === 1 && referenceMode === "image" ? { input_reference: publicImages[0] } : references.length ? { images: publicImages } : {}),
-            ...(publicVideos.length ? { reference_videos: publicVideos } : {}),
-            ...(publicAudios.length ? { reference_audios: publicAudios } : {}),
-            metadata: { idempotency_key: requestId },
-        };
-    } else {
-        const imageFiles = await Promise.all(references.map(async (image) => dataUrlToFile({ ...image, dataUrl: await imageToDataUrl(image, options) })));
-        imageFiles.forEach(validateShafuImage);
-        const videoFiles = await Promise.all(videos.map((video) => referenceMediaToFile(video, "reference-video.mp4", "invalidReferenceVideo", options)));
-        const audioFiles = await Promise.all(audios.map((audio) => referenceMediaToFile(audio, "reference-audio.mp3", "invalidReferenceAudio", options)));
-        const form = new FormData();
-        Object.entries(fields).forEach(([key, value]) => form.append(key, String(value)));
-        form.append("metadata", JSON.stringify({ idempotency_key: requestId }));
-        imageFiles.forEach((file) => form.append("image", file, file.name));
-        videoFiles.forEach((file) => form.append("reference_videos", file, file.name));
-        audioFiles.forEach((file) => form.append("reference_audios", file, file.name));
-        body = form;
-    }
+    const body: Record<string, unknown> = {
+        ...fields,
+        ...(images.length === 1 && referenceMode === "image" ? { input_reference: images[0] } : images.length ? { images } : {}),
+        ...(videoValues.length ? { reference_videos: videoValues } : {}),
+        ...(audioValues.length ? { reference_audios: audioValues } : {}),
+        metadata: { idempotency_key: requestId },
+    };
     try {
         const payload = (await axios.post<unknown>(providerApiUrl(config.baseUrl, "/v1/videos"), body, {
-            headers: { ...aiHeaders(config, body instanceof FormData ? undefined : "application/json"), "Idempotency-Key": requestId },
+            headers: { ...aiHeaders(config, "application/json"), "Idempotency-Key": requestId },
             signal: options?.signal,
         })).data;
         const id = taskIdFromPayload(payload);
@@ -452,35 +432,17 @@ async function createLegacyShafuVideoTask(config: AiConfig, model: string, promp
         idempotency_key: `canvas-${nanoid()}`,
     };
 
-    const publicImages = references.map(publicImageUrl);
-    const publicVideos = videos.map((video) => publicMediaUrl(video.url));
-    const publicAudios = audios.map((audio) => publicMediaUrl(audio.url));
-    const publicCount = [...publicImages, ...publicVideos, ...publicAudios].filter(Boolean).length;
-    const mediaCount = references.length + videos.length + audios.length;
-    if (publicCount > 0 && publicCount < mediaCount) throw new Error(i18n.t("providerErrors.shafuMixedReferencesUnsupported"));
-
-    let body: Record<string, unknown> | FormData = {
+    const { images, videoValues, audioValues } = await resolveShafuReferenceValues(references, videos, audios, options);
+    const body: Record<string, unknown> = {
         ...fields,
-        ...(publicImages.length ? { images: publicImages } : {}),
-        ...(publicVideos.length ? { reference_videos: publicVideos } : {}),
-        ...(publicAudios.length ? { reference_audios: publicAudios } : {}),
+        ...(images.length ? { images } : {}),
+        ...(videoValues.length ? { reference_videos: videoValues } : {}),
+        ...(audioValues.length ? { reference_audios: audioValues } : {}),
     };
-    if (mediaCount && !publicCount) {
-        const imageFiles = await Promise.all(references.map(async (image) => dataUrlToFile({ ...image, dataUrl: await imageToDataUrl(image, options) })));
-        imageFiles.forEach(validateShafuImage);
-        const videoFiles = await Promise.all(videos.map((video) => referenceMediaToFile(video, "reference-video.mp4", "invalidReferenceVideo", options)));
-        const audioFiles = await Promise.all(audios.map((audio) => referenceMediaToFile(audio, "reference-audio.mp3", "invalidReferenceAudio", options)));
-        const form = new FormData();
-        Object.entries(fields).forEach(([key, value]) => form.append(key, String(value)));
-        imageFiles.forEach((file) => form.append("image", file, file.name));
-        videoFiles.forEach((file) => form.append("reference_videos", file, file.name));
-        audioFiles.forEach((file) => form.append("reference_audios", file, file.name));
-        body = form;
-    }
 
     try {
         const payload = (await axios.post<unknown>(providerApiUrl(config.baseUrl, "/v1/videos"), body, {
-            headers: aiHeaders(config, body instanceof FormData ? undefined : "application/json"),
+            headers: aiHeaders(config, "application/json"),
             signal: options?.signal,
         })).data;
         const id = taskIdFromPayload(payload);
@@ -583,6 +545,24 @@ function findMediaFileId(payload: unknown): string {
 function validateShafuImage(file: File) {
     if (file.size > 24 * 1024 * 1024) throw new Error(i18n.t("providerErrors.shafuImageTooLarge", { name: file.name }));
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type.toLowerCase())) throw new Error(i18n.t("providerErrors.shafuImageFormatUnsupported", { name: file.name }));
+}
+
+async function resolveShafuReferenceValues(references: ReferenceImage[], videos: ReferenceVideo[], audios: ReferenceAudio[], options?: RequestOptions) {
+    const images = await Promise.all(references.map(async (image) => {
+        const publicUrl = publicImageUrl(image);
+        if (publicUrl) return publicUrl;
+        const dataUrl = await imageToDataUrl(image, options);
+        validateShafuImage(dataUrlToFile({ ...image, dataUrl }));
+        return dataUrl;
+    }));
+    const videoValues = await Promise.all(videos.map((video) => shafuMediaValue(video, "reference-video.mp4", "invalidReferenceVideo", options)));
+    const audioValues = await Promise.all(audios.map((audio) => shafuMediaValue(audio, "reference-audio.mp3", "invalidReferenceAudio", options)));
+    return { images, videoValues, audioValues };
+}
+
+async function shafuMediaValue(item: ReferenceVideo | ReferenceAudio, fallbackName: string, errorKey: "invalidReferenceVideo" | "invalidReferenceAudio", options?: RequestOptions) {
+    if (isPublicMediaUrl(item.url)) return item.url;
+    return readFileAsDataUrl(await referenceMediaToFile(item, fallbackName, errorKey, options));
 }
 
 async function pollAutoDlVideoTask(config: AiConfig, task: VideoGenerationTask, options?: RequestOptions): Promise<VideoGenerationTaskState> {

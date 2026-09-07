@@ -2,11 +2,17 @@
 
 ## Unreleased
 
+## v0.18.2 - 2026-09-07
+
+- [修复] Shafu 所有视频模型的本地图片、视频和音频参考改为 Data URL JSON 提交，保证 `duration` 始终为数字并支持与公网参考素材混用。
+
+## v0.18.1 - 2026-09-07
+
 - [新增] 增加 Windows 本地启动器与 GitHub Release 源码更新脚本，更新时保留本地配置目录。
 - [调整] 界面 GitHub 入口改为当前维护仓库，并移除顶部文档入口。
 - [调整] Shafu 多协议渠道按官方 `/v1/models` 动态保留图片、视频和其他模型，并根据 capabilities 与官方模型 ID 分类；不再把整个渠道强制标记为视频。
 - [新增] Shafu Banana/GPT Image 图片模型接入旧版 `/v1/videos` 异步生图与多图生图，统一协议图片模型接入 `/v1/images/generations`、`/v1/tasks/{task_id}` 轮询及 `file_id` 媒体下载。
-- [修复] Shafu 视频提交统一使用数字 `duration`，并按文档发送 `input_reference` / `images`、multipart `image`、参考视频和参考音频，避免字符串时长触发 NewAPI `Alias.duration` 解码错误。
+- [调整] Shafu 视频按文档发送 `input_reference` / `images`、参考视频和参考音频，并保留统一协议与旧版协议各自的任务轮询路径。
 
 ## v0.18.0 - 2026-09-05
 

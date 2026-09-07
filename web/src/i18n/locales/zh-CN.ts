@@ -89,7 +89,6 @@ export default {
         shafuAudioCount: "Shafu 全能参考模式最多支持 3 个参考音频",
         shafuImageTooLarge: "参考图 {{name}} 超过 Shafu 的 24 MiB 上限",
         shafuImageFormatUnsupported: "参考图 {{name}} 不是 Shafu 支持的 JPEG、PNG 或 WebP 格式",
-        shafuMixedReferencesUnsupported: "Shafu 文档没有明确本地文件与公网 URL 混合提交的字段编码；请将本次参考素材全部改为本地文件或全部改为公网 URL，未发送请求",
         autoDlReferenceAudioFormatUnsupported: "AutoDL 本地参考音频不支持 {{format}}；请选择 MP3、WAV、M4A/MP4 音频或 FLAC",
         capabilityAudio: "音频",
         unknownMediaFormat: "未知格式",

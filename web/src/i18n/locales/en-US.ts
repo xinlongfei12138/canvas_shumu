@@ -89,7 +89,6 @@ export default {
         shafuAudioCount: "Shafu general reference mode supports up to three reference audio files",
         shafuImageTooLarge: "Reference image {{name}} exceeds Shafu's 24 MiB limit",
         shafuImageFormatUnsupported: "Reference image {{name}} is not a Shafu-supported JPEG, PNG, or WebP file",
-        shafuMixedReferencesUnsupported: "Shafu does not document field encoding for requests that mix local files with public URLs. Use all-local files or all-public URLs; no request was sent.",
         autoDlReferenceAudioFormatUnsupported: "AutoDL does not support local reference audio in {{format}}. Use MP3, WAV, M4A/MP4 audio, or FLAC.",
         capabilityAudio: "audio",
         unknownMediaFormat: "unknown format",

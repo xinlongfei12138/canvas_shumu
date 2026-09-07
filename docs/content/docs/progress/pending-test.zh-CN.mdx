@@ -5,6 +5,8 @@ description: 当前版本已实现但仍需人工验证的变更项
 
 # 待测试
 
+- Shafu 视频时长修复：从渠道拉取的全部视频模型，包括 SD、SDF、Seedance 2.5 和服务端返回的其他模型，都应使用 JSON 提交且 `duration` 必须为数字。本地图片、视频和音频应转成 Data URL 后分别放入 `input_reference` / `images`、`reference_videos`、`reference_audios`；公网 URL 应原样发送，本地与公网素材混用时也不得退回会把时长转成字符串的 multipart 请求。统一协议继续轮询 `/v1/tasks/{task_id}`，旧版协议继续轮询 `/v1/videos/{task_id}`。
+
 - Shafu 图片模型：刷新模型列表后，确认 Banana/GPT Image 模型归类到图片、Seedance 模型归类到视频，其他模型保留并可手动调整能力。确认 Banana/GPT Image 文生图请求 `/v1/videos` 并轮询 `/v1/videos/{task_id}`，图生图把公网参考图放入 `images`；统一协议图片模型请求 `/v1/images/generations` 并轮询 `/v1/tasks/{task_id}`。完成结果为 URL、Base64 或 `file_id` 时都应下载并保存到画布本地；由于现有统一协议文档未提供图生图字段，统一协议模型图生图应显示明确提示且不发送请求。
 
 - Canvas 开放视频 API：新建渠道时应可选择该协议并自动填写 `https://api.canvas.12646464.xyz`；模型只能以视频能力手动添加。确认文生视频、公网素材 JSON、本地图片/视频/音频 FormData、首尾帧、`aspect_ratio` / `seconds` / `resolution`、任务轮询和刷新后恢复均正常。接口未提供混合协议前，同一任务混用本地素材和公网 URL 应在请求前明确拒绝；失败响应应显示上游错误和退款金额。
