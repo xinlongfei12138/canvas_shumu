@@ -5,6 +5,8 @@ description: Implemented changes that still need manual verification
 
 # Pending Tests
 
+- Windows updater path handling: update an installation located in a Chinese or ASCII Windows path from an older release to `v0.18.4` or later. Source files should be replaced without a `\ is illegal at end of pattern` error, configured dependency/data paths should remain untouched, `VERSION` should change before the build runs, and the launched UI should show the new version.
+
 - Shafu `SD-720p-933`: submit with a reference image and confirm the request still includes the image reference but omits `face_processing`, avoiding the `unsupported video field: face_processing` rejection. Other Shafu video models should keep their existing `face_processing` behavior.
 
 - Shafu video duration fix: verify every fetched Shafu video model, including SD, SDF, Seedance 2.5, and other server-returned models, submits JSON with numeric `duration`. Local image, video, and audio references should be converted to Data URLs and use `input_reference` / `images`, `reference_videos`, and `reference_audios`; public URLs should remain unchanged, and local plus public references should work in the same request without falling back to multipart form fields.

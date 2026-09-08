@@ -49,6 +49,20 @@ function Build-Web {
     try { npm run build } finally { Pop-Location }
 }
 
+function ConvertTo-UpdatePathKey([string]$Path) {
+    $separator = [IO.Path]::DirectorySeparatorChar
+    return $Path.Replace([IO.Path]::AltDirectorySeparatorChar, $separator).Trim([char[]]@($separator)).ToLowerInvariant()
+}
+
+function Test-PreservedUpdatePath([string]$RelativePath, [hashtable]$PreserveKeys) {
+    $relativeKey = ConvertTo-UpdatePathKey $RelativePath
+    $separator = [string][IO.Path]::DirectorySeparatorChar
+    foreach ($preserveKey in $PreserveKeys.Keys) {
+        if ($relativeKey -eq $preserveKey -or $relativeKey.StartsWith($preserveKey + $separator, [StringComparison]::Ordinal)) { return $true }
+    }
+    return $false
+}
+
 $config = Read-UpdateConfig
 if (-not $config -or -not $config.repository -or ([string]$config.repository) -like "YOUR_GITHUB_*") {
     Write-Host "No GitHub update repository is configured; skipping remote update."
@@ -100,16 +114,14 @@ try {
         if (Test-Path -LiteralPath $buildDirectory) { Remove-Item -LiteralPath $buildDirectory -Recurse -Force }
     }
     $preserveKeys = @{}
-    foreach ($item in $preserve) { $preserveKeys[(($item -replace '/', '\').TrimStart('\')).ToLowerInvariant()] = $true }
+    foreach ($item in $preserve) {
+        $key = ConvertTo-UpdatePathKey ([string]$item)
+        if ($key) { $preserveKeys[$key] = $true }
+    }
 
     Get-ChildItem -LiteralPath $source.FullName -Recurse -File | ForEach-Object {
-        $relative = $_.FullName.Substring($source.FullName.Length).TrimStart('\')
-        $parts = $relative -split '\'
-        $skip = $false
-        for ($count = 1; $count -le $parts.Length; $count++) {
-            $prefix = ($parts[0..($count - 1)] -join '\').ToLowerInvariant()
-            if ($preserveKeys.ContainsKey($prefix)) { $skip = $true; break }
-        }
+        $relative = $_.FullName.Substring($source.FullName.Length).TrimStart([char[]]@([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar))
+        $skip = Test-PreservedUpdatePath $relative $preserveKeys
         if (-not $skip) {
             $target = Join-Path $Root $relative
             New-Item -ItemType Directory -Path (Split-Path $target -Parent) -Force | Out-Null

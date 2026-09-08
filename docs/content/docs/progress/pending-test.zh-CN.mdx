@@ -5,6 +5,8 @@ description: 当前版本已实现但仍需人工验证的变更项
 
 # 待测试
 
+- Windows 自动更新路径：在中文或英文 Windows 目录中，将旧版本更新到 `v0.18.4` 或更高版本。覆盖源码时不应再出现“`\` 在模式末尾非法”，配置的依赖和数据目录应保持不变，构建开始前 `VERSION` 应已更新，启动后界面应显示新版本。
+
 - Shafu `SD-720p-933`：连接参考图片提交视频时，请求应继续包含图片参考，但不再包含 `face_processing`，不应再出现 `unsupported video field: face_processing`；其他 Shafu 视频模型的该字段行为应保持不变。
 
 - Shafu 视频时长修复：从渠道拉取的全部视频模型，包括 SD、SDF、Seedance 2.5 和服务端返回的其他模型，都应使用 JSON 提交且 `duration` 必须为数字。本地图片、视频和音频应转成 Data URL 后分别放入 `input_reference` / `images`、`reference_videos`、`reference_audios`；公网 URL 应原样发送，本地与公网素材混用时也不得退回会把时长转成字符串的 multipart 请求。统一协议继续轮询 `/v1/tasks/{task_id}`，旧版协议继续轮询 `/v1/videos/{task_id}`。
