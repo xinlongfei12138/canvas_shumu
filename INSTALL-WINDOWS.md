@@ -22,13 +22,15 @@ npm run build
 npm run start
 ```
 
-也可以双击项目根目录的 Start-Canvas.cmd 启动。它会先检查已配置的 GitHub Release；没有配置更新仓库时会直接启动。
+也可以双击项目根目录的 `Start-Canvas.cmd` 启动。它会先检查 GitHub Release 和 `main` 分支版本，再检查 `web` 与 Canvas Agent 的依赖；依赖缺失或锁文件变化时会自动安装，源码更新或缺少构建产物时会自动构建。
 
 启用本地自动更新：
 
-默认更新仓库已经设置为 xinlongfei12138/canvas_shumu。以后通过 GitHub Release 发布新版本，启动脚本会自动检查；只有需要切换更新仓库时，才需要复制 update.config.example.json 为 .update-config.json 并修改 repository。
+默认更新仓库已经设置为 `xinlongfei12138/canvas_shumu`。以后发布新版本时，启动脚本会自动检查；只有需要切换更新仓库时，才需要复制 `update.config.example.json` 为 `.update-config.json` 并修改 `repository`。
 
-更新脚本会保留 .update-config.json、依赖目录和本地 data，并在更新后重新构建前端。浏览器里的模型配置、画布和素材不在源码包中，也不会被源码更新覆盖。
+只更新而不启动画布时，可以双击项目根目录的 `Update-Canvas.bat`。它也会自动修复依赖并完成必要构建。
+
+更新脚本会保留 `.update-config.json`、依赖目录和本地 `data`，并在更新后重新构建前端与 Canvas Agent。浏览器里的模型配置、画布和素材不在源码包中，也不会被源码更新覆盖。
 
 终端保持运行，然后只使用下面的地址打开画布：
 
@@ -73,4 +75,4 @@ npm start
 3. 停止旧的 3000 端口进程，再运行 `npm run start`。
 4. 打开 `http://127.0.0.1:3000` 并刷新页面。
 
-页面右上角应显示 `v0.18.0`。
+页面右上角应显示根目录 `VERSION` 文件中的当前版本号。

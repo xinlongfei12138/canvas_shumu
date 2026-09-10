@@ -9,28 +9,21 @@ $Root = (Resolve-Path $PSScriptRoot).Path
 $Web = Join-Path $Root "web"
 
 if (-not $SkipUpdate) {
+    Write-Host "Checking for Canvas updates..."
     try {
-        & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Root "scripts\Update-Canvas.ps1") -NoPrompt:$NoPrompt -SkipDependencies:$SkipDependencies
+        & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Root "scripts\Update-Canvas.ps1") -NoPrompt:$NoPrompt -SkipDependencies
         if ($LASTEXITCODE -ne 0) { Write-Warning "Automatic update did not complete; starting the current version." }
     } catch {
         Write-Warning "Automatic update failed; starting the current version: $($_.Exception.Message)"
     }
 }
 
-if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
-    throw "npm was not found. Install Node.js 20.19 or later first."
-}
-
-if (-not (Test-Path (Join-Path $Web "node_modules"))) {
-    Push-Location $Web
-    try {
-        if (Test-Path (Join-Path $Web "package-lock.json")) { npm ci } else { npm install }
-    } finally { Pop-Location }
-}
-
-if (-not (Test-Path (Join-Path $Web "dist"))) {
-    Push-Location $Web
-    try { npm run build } finally { Pop-Location }
+if (-not $SkipDependencies) {
+    Write-Host "Checking dependencies and build output..."
+    & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $Root "scripts\Prepare-Canvas.ps1") -Build
+    if ($LASTEXITCODE -ne 0) { throw "Canvas dependency check or build failed." }
+} elseif (-not (Test-Path -LiteralPath (Join-Path $Web "dist\index.html"))) {
+    throw "web/dist is missing. Start again without -SkipDependencies so it can be built automatically."
 }
 
 function Stop-CanvasPreview {

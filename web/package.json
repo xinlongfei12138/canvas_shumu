@@ -54,5 +54,10 @@
         "prettier": "^3.8.3",
         "typescript": "^5",
         "vite": "^7.3.0"
+    },
+    "optionalDependencies": {
+        "@rollup/rollup-win32-x64-msvc": "4.62.2",
+        "lightningcss-win32-x64-msvc": "1.32.0",
+        "@tailwindcss/oxide-win32-x64-msvc": "4.2.4"
     }
 }
