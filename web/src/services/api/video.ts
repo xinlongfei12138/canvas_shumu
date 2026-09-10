@@ -54,15 +54,47 @@ export async function requestVideoGeneration(config: AiConfig, prompt: string, r
 }
 
 export async function waitForVideoGenerationTask(config: AiConfig, task: VideoGenerationTask, options?: RequestOptions): Promise<VideoGenerationResult> {
-    for (let attempt = 0; attempt < 120; attempt += 1) {
+    // H3 workflows run locally and can take longer than hosted APIs, especially
+    // on the first request while the model is loaded into VRAM. Keep the task
+    // id resumable instead of turning a still-running ComfyUI job into a false
+    // timeout after the generic five-minute window.
+    const isComfyUi = task.provider === "comfyui";
+    const maxAttempts = isComfyUi ? 540 : 120;
+    const pollIntervalMs = isComfyUi ? 5000 : 2500;
+    let transientErrors = 0;
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
         if (options?.signal?.aborted) throw new DOMException("Aborted", "AbortError");
-        const state = await pollVideoGenerationTask(config, task, options);
+        let state: VideoGenerationTaskState;
+        try {
+            state = await pollVideoGenerationTask(config, task, options);
+            transientErrors = 0;
+        } catch (error) {
+            if (!isComfyUi || !isRetryableComfyPollError(error) || transientErrors >= 5) throw error;
+            // A tunnel/proxy can briefly drop a request while ComfyUI keeps
+            // running. Retry with a bounded backoff and preserve task.id.
+            transientErrors += 1;
+            await delay(Math.min(15000, pollIntervalMs * transientErrors), options?.signal);
+            continue;
+        }
         if (state.status === "completed") return state.result;
         if (state.status === "failed") throw videoTaskFailed(state.error);
-        if (attempt === 119) throw new Error(apiText("videoTimeout", { provider: "" }));
-        await delay(2500, options?.signal);
+        if (attempt === maxAttempts - 1) throw new Error(apiText("videoTimeout", { provider: isComfyUi ? "ComfyUI " : "" }));
+        await delay(pollIntervalMs, options?.signal);
     }
-    throw new Error(apiText("videoTimeout", { provider: "" }));
+    throw new Error(apiText("videoTimeout", { provider: isComfyUi ? "ComfyUI " : "" }));
+}
+
+function isRetryableComfyPollError(error: unknown) {
+    if (axios.isCancel(error)) return false;
+    if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        return !status || status === 408 || status === 425 || status === 429 || status >= 500;
+    }
+    if (error instanceof DOMException && error.name === "AbortError") return false;
+    // readAxiosError intentionally presents network failures as a short
+    // localized message, so retain the task for that fallback as well.
+    const message = error instanceof Error ? error.message : String(error);
+    return /请求失败|任务查询失败|下载失败|network|timeout|fetch/i.test(message);
 }
 
 export function isVideoTaskFailed(error: unknown) {
