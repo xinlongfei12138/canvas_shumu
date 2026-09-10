@@ -197,10 +197,11 @@ export async function storeGeneratedVideo(result: VideoGenerationResult): Promis
 }
 
 async function createOpenAIVideoTask(config: AiConfig, model: string, prompt: string, references: ReferenceImage[], options?: VideoMediaOptions): Promise<VideoGenerationTask> {
-    const images = await Promise.all(references.map(async (image) => dataUrlToFile({ ...image, dataUrl: await imageToDataUrl(image) })));
-    const videos = await Promise.all((options?.videos || []).map((video) => referenceMediaToFile(video, "ref.mp4", "invalidReferenceVideo", options)));
-    const audios = await Promise.all((options?.audios || []).map((audio) => referenceMediaToFile(audio, "ref.mp3", "invalidReferenceAudio", options)));
-    const mode = resolveVideoMode(config.videoMode, images.length);
+    const geeknow = isGeeknowChannel(config);
+    const images = geeknow ? [] : await Promise.all(references.map(async (image) => dataUrlToFile({ ...image, dataUrl: await imageToDataUrl(image) })));
+    const videos = geeknow ? [] : await Promise.all((options?.videos || []).map((video) => referenceMediaToFile(video, "ref.mp4", "invalidReferenceVideo", options)));
+    const audios = geeknow ? [] : await Promise.all((options?.audios || []).map((audio) => referenceMediaToFile(audio, "ref.mp3", "invalidReferenceAudio", options)));
+    const mode = resolveVideoMode(config.videoMode, references.length);
     const body = new FormData();
     body.append("model", modelOptionName(model));
     body.append("prompt", prompt);
@@ -210,14 +211,28 @@ async function createOpenAIVideoTask(config: AiConfig, model: string, prompt: st
     body.append("generate_audio", String(boolConfig(config.videoGenerateAudio, true)));
     body.append("watermark", String(boolConfig(config.videoWatermark, false)));
     body.append("mode", mode);
-    if (mode === "frames") {
-        if (images[0]) body.append("first_frame", images[0], "first.png");
-        if (images[1]) body.append("last_frame", images[1], "last.png");
+    if (geeknow && (references.length || options?.videos?.length || options?.audios?.length)) {
+        const imageUrls = await Promise.all(references.map((image) => resolvePublicReferenceImage(image, config, options?.signal)));
+        const videoUrls = await Promise.all((options?.videos || []).map((video) => resolvePublicMedia(video, "video", config, "standard", options?.signal).then((asset) => asset.url)));
+        const audioUrls = await Promise.all((options?.audios || []).map((audio) => resolvePublicMedia(audio, "audio", config, "standard", options?.signal).then((asset) => asset.url)));
+        if (mode === "frames") {
+            if (imageUrls[0]) body.append("first_frame", imageUrls[0]);
+            if (imageUrls[1]) body.append("last_frame", imageUrls[1]);
+        } else {
+            imageUrls.forEach((url) => body.append("image[]", url));
+        }
+        videoUrls.forEach((url) => body.append("video[]", url));
+        audioUrls.forEach((url) => body.append("audio[]", url));
     } else {
-        images.forEach((file) => body.append("image[]", file, "ref.png"));
+        if (mode === "frames") {
+            if (images[0]) body.append("first_frame", images[0], "first.png");
+            if (images[1]) body.append("last_frame", images[1], "last.png");
+        } else {
+            images.forEach((file) => body.append("image[]", file, "ref.png"));
+        }
+        videos.forEach((file) => body.append("video[]", file));
+        audios.forEach((file) => body.append("audio[]", file));
     }
-    videos.forEach((file) => body.append("video[]", file));
-    audios.forEach((file) => body.append("audio[]", file));
     try {
         const created = unwrapVideoResponse((await axios.post<ApiVideoResponse>(aiApiUrl(config, "/videos"), body, { headers: aiHeaders(config), signal: options?.signal })).data);
         if (!created.id) throw new Error(apiText("noVideoTaskId"));
@@ -331,6 +346,14 @@ async function createAutoDlVideoTask(config: AiConfig, model: string, prompt: st
         return { id, provider: "autodl", model };
     } catch (error) {
         throw new Error(readAxiosError(error, apiText("videoTaskCreateFailed")));
+    }
+}
+
+function isGeeknowChannel(config: Pick<AiConfig, "baseUrl">) {
+    try {
+        return new URL(config.baseUrl).hostname.toLowerCase().endsWith("geeknow.top");
+    } catch {
+        return config.baseUrl.toLowerCase().includes("geeknow");
     }
 }
 

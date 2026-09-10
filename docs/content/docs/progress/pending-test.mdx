@@ -5,6 +5,8 @@ description: Implemented changes that still need manual verification
 
 # Pending Tests
 
+- Geeknow OpenAI-compatible models: refresh the model list and confirm all server-returned records are retained, supported_endpoint_types openai-video models appear under video capability, image/audio endpoint and name metadata are classified correctly, and text models remain text. Submit a Geeknow video with local image, video, or audio references and confirm the multipart request contains URL fields only (no browser File parts), using the configured public media relay for local assets; ordinary OpenAI channels must keep their existing file-upload behavior.
+
 - Native ComfyUI H3 workflow: import a MiniMax H3 API Prompt JSON into a ComfyUI channel and submit it with local image, video, and audio references. Confirm references are uploaded to ComfyUI input storage, stale template media is removed, canvas resolutions are converted to the nearest H3 megapixel preset and 32-pixel dimensions, and the task automatically selects text-to-video, image-to-video, first/last-frame, or all-reference mode. Completed videos should be downloaded through `/history` and `/view` and stored locally in the canvas. Existing OpenAI, Gemini, Shafu, Canvas, and AutoDL video channels should remain unchanged.
 
 - Windows updater path handling: update an installation located in a Chinese or ASCII Windows path from an older release to `v0.18.4` or later. Source files should be replaced without a `\ is illegal at end of pattern` error, configured dependency/data paths should remain untouched, `VERSION` should change before the build runs, and the launched UI should show the new version.

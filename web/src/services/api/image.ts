@@ -1234,7 +1234,75 @@ export async function fetchImageModels(config: Pick<AiConfig, "baseUrl" | "apiKe
 
 export async function fetchChannelModels(channel: ModelChannel) {
     if (channel.apiFormat === "shafu") return fetchShafuModels(channel);
+    if (channel.apiFormat === "openai") return fetchOpenAiModels(channel);
     return (await fetchImageModels({ baseUrl: channel.baseUrl, apiKey: channel.apiKey, apiFormat: channel.apiFormat })).map((name) => ({ name, capability: guessCapability(name) }));
+}
+
+type OpenAiModel = {
+    id?: string;
+    supported_endpoint_types?: unknown;
+    type?: unknown;
+    modality?: unknown;
+    modalities?: unknown;
+};
+
+async function fetchOpenAiModels(channel: ModelChannel): Promise<ChannelModel[]> {
+    try {
+        const response = await axios.get<unknown>(buildApiUrl(channel.baseUrl, "/models"), {
+            headers: { Authorization: "Bearer " + channel.apiKey },
+        });
+        return openAiModelList(response.data)
+            .filter((model) => Boolean(model.id?.trim()))
+            .map((model) => {
+                const name = model.id!.trim();
+                const endpointTypes = modelEndpointTypes(model);
+                return {
+                    name,
+                    capability: openAiModelCapability(model, name),
+                    ...(endpointTypes.length ? { providerCapabilities: { endpoints: endpointTypes } } : {}),
+                };
+            })
+            .sort((a, b) => a.name.localeCompare(b.name));
+    } catch (error) {
+        throw new Error(readAxiosError(error, apiText("modelReadFailed")));
+    }
+}
+
+function openAiModelList(payload: unknown): OpenAiModel[] {
+    if (Array.isArray(payload)) return payload.filter(isOpenAiModel);
+    if (!payload || typeof payload !== "object") return [];
+    const root = payload as Record<string, unknown>;
+    const data = root.data;
+    if (Array.isArray(data)) return data.filter(isOpenAiModel);
+    const nestedModels = data && typeof data === "object" ? (data as Record<string, unknown>).models : undefined;
+    if (Array.isArray(nestedModels)) return nestedModels.filter(isOpenAiModel);
+    if (Array.isArray(root.models)) return root.models.filter(isOpenAiModel);
+    return [];
+}
+
+function isOpenAiModel(value: unknown): value is OpenAiModel {
+    return Boolean(value && typeof value === "object" && typeof (value as Record<string, unknown>).id === "string");
+}
+
+function modelEndpointTypes(model: OpenAiModel) {
+    const value = model.supported_endpoint_types;
+    if (Array.isArray(value)) return value.filter((item): item is string => typeof item === "string").map((item) => item.trim()).filter(Boolean);
+    if (typeof value === "string") return value.split(/[;,]/).map((item) => item.trim()).filter(Boolean);
+    return [];
+}
+
+function openAiModelCapability(model: OpenAiModel, name: string): ChannelModel["capability"] {
+    const endpoints = modelEndpointTypes(model).map((endpoint) => endpoint.toLowerCase());
+    if (endpoints.some((endpoint) => endpoint === "openai-video" || endpoint.includes("video"))) return "video";
+    if (endpoints.some((endpoint) => endpoint === "audio" || endpoint.includes("audio") || endpoint.includes("tts"))) return "audio";
+    if (endpoints.some((endpoint) => endpoint === "image" || endpoint.includes("image"))) return "image";
+    const declared = [model.type, model.modality, ...(Array.isArray(model.modalities) ? model.modalities : [model.modalities])]
+        .filter((value): value is string => typeof value === "string")
+        .map((value) => value.toLowerCase());
+    if (declared.some((value) => value.includes("video"))) return "video";
+    if (declared.some((value) => value.includes("audio") || value.includes("speech"))) return "audio";
+    if (declared.some((value) => value.includes("image"))) return "image";
+    return guessCapability(name);
 }
 
 async function fetchShafuModels(channel: ModelChannel): Promise<ChannelModel[]> {
