@@ -6,10 +6,11 @@ import { dataUrlToFile, readFileAsDataUrl } from "@/lib/image-utils";
 import { clampVideoSeconds, computeVideoSize, inferVideoRatio } from "@/lib/media-size";
 import { getMediaBlob, resolveMediaUrl, uploadMediaFile, type UploadedFile } from "@/services/file-storage";
 import { imageToDataUrl } from "@/services/image-storage";
-import { boolConfig, buildApiUrl, modelOptionName, resolveModelRequestConfig, resolveModelScript, withLocalProxy, type AiConfig, type ProviderModelCapabilities } from "@/stores/use-config-store";
+import { boolConfig, buildApiUrl, modelOptionName, resolveModelRequestConfig, resolveModelScript, resolveModelWorkflowJson, withLocalProxy, type AiConfig, type ProviderModelCapabilities } from "@/stores/use-config-store";
 import { runModelPlugin } from "./model-plugin";
 import { buildAutoDlVideoBody, providerApiUrl } from "./provider-protocols";
 import { resolvePublicMedia, resolvePublicReferenceImage } from "./public-media-upload";
+import { canvasResolutionToMiniMaxH3, findComfyExecutionError, findComfyVideoOutput, parseComfyWorkflow, prepareComfyVideoWorkflow } from "./comfyui";
 import type { ReferenceImage } from "@/types/image";
 import type { ReferenceAudio, ReferenceVideo } from "@/types/media";
 
@@ -23,7 +24,7 @@ const apiText = (key: string, options?: Record<string, unknown>) => i18n.t(`apiE
 const providerText = (key: string, options?: Record<string, unknown>) => i18n.t(`providerErrors.${key}`, options);
 
 export type VideoGenerationResult = { blob?: Blob; url?: string; mimeType?: string };
-export type VideoTaskProvider = "openai" | "gemini" | "volcengine" | "zizidonghua" | "autodl" | "canvasvideo" | "shafu" | "plugin";
+export type VideoTaskProvider = "openai" | "gemini" | "volcengine" | "zizidonghua" | "autodl" | "comfyui" | "canvasvideo" | "shafu" | "plugin";
 export type VideoGenerationTask = { id: string; provider: VideoTaskProvider; model: string; shafuProtocol?: "unified" | "legacy" };
 type GeminiInlineData = { bytesBase64Encoded: string; mimeType: string };
 type GeminiVideoOperation = {
@@ -84,6 +85,7 @@ export async function createVideoGenerationTask(config: AiConfig, prompt: string
     if (requestConfig.apiFormat === "volcengine") return createVolcengineVideoTask(requestConfig, selectedModel, prompt, references, options);
     if (requestConfig.apiFormat === "zizidonghua") return createZiziVideoTask(requestConfig, selectedModel, prompt, references, options);
     if (requestConfig.apiFormat === "autodl") return createAutoDlVideoTask(requestConfig, selectedModel, prompt, references, options);
+    if (requestConfig.apiFormat === "comfyui") return createComfyUiVideoTask(requestConfig, selectedModel, prompt, references, options);
     if (requestConfig.apiFormat === "canvasvideo") return createCanvasVideoTask(requestConfig, selectedModel, prompt, references, options);
     if (requestConfig.apiFormat === "shafu") return createShafuVideoTask(requestConfig, selectedModel, prompt, references, options);
     return createOpenAIVideoTask(requestConfig, selectedModel, prompt, references, options);
@@ -100,6 +102,7 @@ export async function pollVideoGenerationTask(config: AiConfig, task: VideoGener
     if (task.provider === "volcengine") return pollVolcengineVideoTask(requestConfig, task, options);
     if (task.provider === "zizidonghua") return pollZiziVideoTask(requestConfig, task, options);
     if (task.provider === "autodl") return pollAutoDlVideoTask(requestConfig, task, options);
+    if (task.provider === "comfyui") return pollComfyUiVideoTask(requestConfig, task, options);
     if (task.provider === "canvasvideo") return pollCanvasVideoTask(requestConfig, task, options);
     if (task.provider === "shafu") return pollShafuVideoTask(requestConfig, task, options);
     return pollOpenAIVideoTask(requestConfig, task, options);
@@ -297,6 +300,149 @@ async function createAutoDlVideoTask(config: AiConfig, model: string, prompt: st
     } catch (error) {
         throw new Error(readAxiosError(error, apiText("videoTaskCreateFailed")));
     }
+}
+
+async function createComfyUiVideoTask(config: AiConfig, model: string, prompt: string, references: ReferenceImage[], options?: VideoMediaOptions): Promise<VideoGenerationTask> {
+    const workflowJson = resolveModelWorkflowJson(config, model);
+    if (!workflowJson) throw new Error("ComfyUI 模型尚未绑定 API Prompt 工作流 JSON，请在模型配置中添加工作流");
+    const workflow = parseComfyWorkflow(workflowJson);
+    const images = await Promise.all(references.map(async (image) => uploadComfyMedia(config, dataUrlToFile({ ...image, dataUrl: await imageToDataUrl(image, options) }), "image", options)));
+    const videos = await Promise.all((options?.videos || []).map(async (video) => uploadComfyMedia(config, await referenceMediaToFile(video, "reference-video.mp4", "invalidReferenceVideo", options), "video", options)));
+    const audios = await Promise.all((options?.audios || []).map(async (audio) => uploadComfyMedia(config, await referenceMediaToFile(audio, "reference-audio.mp3", "invalidReferenceAudio", options), "audio", options)));
+    const resolution = canvasResolutionToMiniMaxH3(config.vquality, config.size);
+    const body = prepareComfyVideoWorkflow(workflow, prompt.trim(), Number(rawVideoSeconds(config.videoSeconds)), resolution, { images, videos, audios }, config.videoMode);
+    try {
+        const payload = (await axios.post<{ prompt_id?: string; number?: number; error?: unknown }>(providerApiUrl(config.baseUrl, "/prompt"), { prompt: body }, { headers: comfyHeaders(config), signal: options?.signal })).data;
+        const id = payload.prompt_id || (typeof payload.number === "number" ? String(payload.number) : "");
+        if (!id) throw new Error(readApiErrorMessage(payload.error) || apiText("noVideoTaskId"));
+        return { id, provider: "comfyui", model };
+    } catch (error) {
+        throw new Error(readAxiosError(error, apiText("videoTaskCreateFailed")));
+    }
+}
+
+async function pollComfyUiVideoTask(config: AiConfig, task: VideoGenerationTask, options?: RequestOptions): Promise<VideoGenerationTaskState> {
+    try {
+        const payload = (await axios.get<unknown>(providerApiUrl(config.baseUrl, `/history/${encodeURIComponent(task.id)}`), { headers: comfyHeaders(config), signal: options?.signal })).data;
+        const record = payload && typeof payload === "object" ? (payload as Record<string, unknown>)[task.id] : undefined;
+        if (!record) return { status: "pending" };
+        const status = record && typeof record === "object" ? (record as Record<string, unknown>).status : undefined;
+        const statusString = status && typeof status === "object" ? String((status as Record<string, unknown>).status_str || "") : String(status || "");
+        if (/error|failed|cancel/i.test(statusString)) return { status: "failed", error: findComfyExecutionError(record) || readApiErrorMessage(record) || apiText("videoGenerationFailed") };
+        const output = findComfyVideoOutput(record);
+        if (!output) {
+            const completed = Boolean(record && typeof record === "object" && (record as Record<string, unknown>).status && typeof (record as Record<string, unknown>).status === "object" && ((record as Record<string, unknown>).status as Record<string, unknown>).completed);
+            return completed ? { status: "failed", error: "ComfyUI 任务已完成，但工作流没有输出可下载的视频" } : { status: "pending" };
+        }
+        const params = new URLSearchParams({ filename: output.filename, subfolder: output.subfolder || "", type: output.type || "output" });
+        const response = await axios.get<Blob>(providerApiUrl(config.baseUrl, `/view?${params.toString()}`), { headers: comfyHeaders(config), responseType: "blob", signal: options?.signal });
+        await assertVideoBlob(response.data);
+        return { status: "completed", result: { blob: normalizeComfyVideoBlob(response.data, output.filename) } };
+    } catch (error) {
+        throw new Error(readAxiosError(error, apiText("videoTaskQueryFailed")));
+    }
+}
+
+async function uploadComfyMedia(config: AiConfig, file: File, kind: "image" | "video" | "audio", options?: RequestOptions) {
+    if (kind === "video") return uploadComfyChunkedMedia(config, file, "/minimax/director/upload_chunk", "ComfyUI 视频分片上传失败", "reference-video.mp4", options);
+    if (kind === "audio") return uploadComfyChunkedMedia(config, file, "/minimax/director/prepare_reference_audio_chunk", "ComfyUI 音频分片上传失败", "reference-audio.mp3", options);
+    const body = new FormData();
+    // Images use ComfyUI's core upload route. Director provides dedicated
+    // chunk routes for video and audio so both are validated and placed in
+    // the input directory with the filename returned to the timeline JSON.
+    body.append("image", file, file.name || `reference.${kind}`);
+    body.append("type", "input");
+    body.append("overwrite", "false");
+    try {
+        const response = await axios.post<unknown>(providerApiUrl(config.baseUrl, "/upload/image"), body, { headers: comfyHeaders(config), signal: options?.signal });
+        const uploaded = comfyUploadResponse(response.data);
+        if (!uploaded) throw new Error("ComfyUI 上传接口未返回可用文件名");
+        return uploaded;
+    } catch (error) {
+        throw new Error(readAxiosError(error, "ComfyUI 参考素材上传失败"));
+    }
+}
+
+function normalizeComfyVideoBlob(blob: Blob, filename: string) {
+    if (blob.type.startsWith("video/")) return blob;
+    const extension = filename.match(/\.([a-z0-9]+)(?:[?#].*)?$/i)?.[1]?.toLowerCase();
+    const mimeType = extension === "webm" ? "video/webm" : extension === "mov" ? "video/quicktime" : extension === "gif" ? "image/gif" : "video/mp4";
+    return new Blob([blob], { type: mimeType });
+}
+
+async function uploadComfyChunkedMedia(config: AiConfig, file: File, endpoint: string, errorMessage: string, fallbackName: string, options?: RequestOptions) {
+    const chunkSize = 8 * 1024 * 1024;
+    const uploadId = nanoid();
+    const filename = safeComfyFilename(file.name || fallbackName);
+    const totalChunks = Math.ceil(file.size / chunkSize);
+    for (let index = 0; index < totalChunks; index += 1) {
+        const body = new FormData();
+        body.append("upload_id", uploadId);
+        body.append("chunk_index", String(index));
+        body.append("total_chunks", String(totalChunks));
+        body.append("filename", filename);
+        body.append("chunk", file.slice(index * chunkSize, Math.min((index + 1) * chunkSize, file.size)), filename + ".part");
+        try {
+            const response = await axios.post<unknown>(providerApiUrl(config.baseUrl, endpoint), body, { headers: comfyHeaders(config), signal: options?.signal });
+            const uploaded = comfyUploadResponse(response.data);
+            if (uploaded) return uploaded;
+        } catch (error) {
+            throw new Error(readAxiosError(error, errorMessage));
+        }
+    }
+    throw new Error(errorMessage.replace(/失败$/, "") + "未返回文件名");
+}
+
+function safeComfyFilename(value: string) {
+    const basename = value.replace(/[\\/]/g, "_").replace(/[^\u4e00-\u9fffA-Za-z0-9._-]/g, "_").replace(/^\.+/, "");
+    return basename || "reference-video.mp4";
+}
+
+function comfyHeaders(config: Pick<AiConfig, "apiKey">) {
+    return config.apiKey.trim() ? { Authorization: `Bearer ${config.apiKey.trim()}` } : undefined;
+}
+
+function comfyUploadedPath(upload: { name?: string; filename?: string; path?: string; file?: string; subfolder?: string }, fallback: string) {
+    const path = String(upload.path || upload.file || "").replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
+    const rawName = upload.name || upload.filename || (path ? path.split("/").pop() : "") || fallback;
+    const name = String(rawName).replace(/^\/+|\/+$/g, "");
+    const pathWithoutName = path && path.endsWith("/" + name) ? path.slice(0, -name.length - 1) : "";
+    let subfolder = String(upload.subfolder || pathWithoutName).replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
+    for (const prefix of ["input/", "output/", "temp/"]) {
+        if (subfolder.toLowerCase().startsWith(prefix)) {
+            subfolder = subfolder.slice(prefix.length);
+            break;
+        }
+    }
+    return subfolder ? subfolder + "/" + name : name;
+}
+
+function comfyUploadResponse(value: unknown): string {
+    const visit = (item: unknown, depth: number): string => {
+        if (depth > 4 || !item) return "";
+        if (typeof item === "string") return item.trim();
+        if (Array.isArray(item)) {
+            for (const child of item) {
+                const result = visit(child, depth + 1);
+                if (result) return result;
+            }
+            return "";
+        }
+        if (typeof item !== "object") return "";
+        const record = item as Record<string, unknown>;
+        const nameKey = ["name", "filename", "path", "file"].find((key) => typeof record[key] === "string" && record[key]);
+        if (nameKey) {
+            const result = comfyUploadedPath({ name: record.name as string | undefined, filename: record.filename as string | undefined, path: record.path as string | undefined, file: record.file as string | undefined, subfolder: record.subfolder as string | undefined }, "");
+            if (result) return result;
+        }
+        for (const child of Object.values(record)) {
+            const result = visit(child, depth + 1);
+            if (result) return result;
+        }
+        return "";
+    };
+    const result = visit(value, 0);
+    return /\.(?:png|jpe?g|webp|gif|bmp|tiff?|mp4|webm|mov|avi|mp3|wav|m4a|flac)$/i.test(result) ? result : "";
 }
 
 async function createCanvasVideoTask(config: AiConfig, model: string, prompt: string, references: ReferenceImage[], options?: VideoMediaOptions): Promise<VideoGenerationTask> {
@@ -649,7 +795,7 @@ async function pollGeminiVideoTask(config: AiConfig, task: VideoGenerationTask, 
 function assertVideoConfig(config: AiConfig, model: string) {
     if (!model) throw new Error(apiText("videoModelRequired"));
     if (!config.baseUrl.trim()) throw new Error(apiText("baseUrlRequired"));
-    if (!config.apiKey.trim()) throw new Error(apiText("apiKeyRequired"));
+    if (config.apiFormat !== "comfyui" && !config.apiKey.trim()) throw new Error(apiText("apiKeyRequired"));
 }
 
 function geminiVideoBaseUrl(config: Pick<AiConfig, "baseUrl">) {

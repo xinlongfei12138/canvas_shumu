@@ -5,7 +5,7 @@ import { nanoid } from "nanoid";
 
 import i18n from "@/i18n";
 
-export type ApiCallFormat = "openai" | "gemini" | "volcengine" | "zizidonghua" | "autodl" | "canvasvideo" | "shafu";
+export type ApiCallFormat = "openai" | "gemini" | "volcengine" | "zizidonghua" | "autodl" | "comfyui" | "canvasvideo" | "shafu";
 export type ModelCapability = "image" | "video" | "text" | "audio";
 export type ReasoningEffort = "auto" | "low" | "medium" | "high" | "xhigh";
 export type ProviderModelCapabilities = {
@@ -22,6 +22,7 @@ export type ChannelModel = {
     capability: ModelCapability;
     script?: string;
     providerCapabilities?: ProviderModelCapabilities;
+    workflowJson?: string;
 };
 
 export type ModelChannel = {
@@ -99,7 +100,7 @@ const CANVAS_VIDEO_BASE_URL = "https://api.canvas.12646464.xyz";
 const SHAFU_BASE_URL = "https://shafu.it.com";
 const PUBLIC_MEDIA_UPLOAD_URL = "";
 const WUHEN_BASE_URL = "https://api.wuhenai.com/v2";
-const API_CALL_FORMATS: ApiCallFormat[] = ["openai", "gemini", "volcengine", "zizidonghua", "autodl", "canvasvideo", "shafu"];
+const API_CALL_FORMATS: ApiCallFormat[] = ["openai", "gemini", "volcengine", "zizidonghua", "autodl", "comfyui", "canvasvideo", "shafu"];
 export const LOCAL_PROXY_PACKAGE = "@basketikun/canvas-proxy";
 export const DEFAULT_LOCAL_PROXY_URL = "http://127.0.0.1:23210";
 
@@ -238,9 +239,13 @@ export function resolveModelScript(config: AiConfig, value: string) {
     return findChannelModel(config, value)?.model.script?.trim() || "";
 }
 
+export function resolveModelWorkflowJson(config: AiConfig, value: string) {
+    return findChannelModel(config, value)?.model.workflowJson?.trim() || "";
+}
+
 function isAiConfigReady(config: AiConfig, model: string) {
     const channel = resolveModelChannel(config, model);
-    return Boolean(model.trim() && channel.baseUrl.trim() && channel.apiKey.trim());
+    return Boolean(model.trim() && channel.baseUrl.trim() && (channel.apiFormat === "comfyui" || channel.apiKey.trim()));
 }
 
 export const useConfigStore = create<ConfigStore>()(
@@ -345,7 +350,8 @@ export function normalizeChannelModels(models: Array<string | ChannelModel> | un
         const capability = typeof item === "string" ? guessCapability(name) : item.capability || guessCapability(name);
         const script = typeof item === "string" ? undefined : item.script?.trim() || undefined;
         const providerCapabilities = typeof item === "string" ? undefined : normalizeProviderModelCapabilities(item.providerCapabilities);
-        result.push({ name, capability, script, providerCapabilities });
+        const workflowJson = typeof item === "string" ? undefined : item.workflowJson?.trim() || undefined;
+        result.push({ name, capability, script, providerCapabilities, workflowJson });
     }
     return result;
 }
@@ -517,18 +523,19 @@ export function defaultBaseUrlForApiFormat(apiFormat: ApiCallFormat) {
     if (apiFormat === "volcengine") return VOLCENGINE_BASE_URL;
     if (apiFormat === "zizidonghua") return ZIZIDONGHUA_BASE_URL;
     if (apiFormat === "autodl") return AUTODL_BASE_URL;
+    if (apiFormat === "comfyui") return "https://comfy.zhuangxing.top";
     if (apiFormat === "canvasvideo") return CANVAS_VIDEO_BASE_URL;
     if (apiFormat === "shafu") return SHAFU_BASE_URL;
     return OPENAI_BASE_URL;
 }
 
 export function isFixedVideoApiFormat(apiFormat: ApiCallFormat) {
-    return apiFormat === "canvasvideo";
+    return apiFormat === "canvasvideo" || apiFormat === "comfyui";
 }
 
 export function channelModelsForApiFormat(apiFormat: ApiCallFormat, models?: Array<string | ChannelModel>) {
     const normalized = normalizeChannelModels(models);
-    if (apiFormat === "canvasvideo") return normalized.map((model) => ({ ...model, capability: "video" as const }));
+    if (apiFormat === "canvasvideo" || apiFormat === "comfyui") return normalized.map((model) => ({ ...model, capability: "video" as const }));
     if (apiFormat === "shafu") {
         return normalized.map((model) => {
             const value = model.name.toLowerCase();

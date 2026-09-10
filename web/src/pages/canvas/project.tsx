@@ -2595,6 +2595,21 @@ function InfiniteCanvasPage() {
                 }
 
                 if (mode === "video") {
+                    const sourceVideo = sourceNode?.type === CanvasNodeType.Video && sourceNode.metadata?.content
+                        ? [{
+                              id: sourceNode.id,
+                              name: `${sourceNode.title || sourceNode.id}.mp4`,
+                              type: sourceNode.metadata.mimeType || "video/mp4",
+                              url: sourceNode.metadata.content,
+                              storageKey: sourceNode.metadata.storageKey,
+                              bytes: sourceNode.metadata.bytes,
+                              width: sourceNode.metadata.naturalWidth,
+                              height: sourceNode.metadata.naturalHeight,
+                              durationMs: sourceNode.metadata.durationMs,
+                          }]
+                        : [];
+                    const referenceVideos = [...new Map([...sourceVideo, ...generationContext.referenceVideos].map((video) => [video.id || video.storageKey || video.url, video])).values()];
+                    const videoGenerationContext = { ...generationContext, referenceVideos, videoCount: referenceVideos.length };
                     const spec = nodeSizeFromRatio(generationConfig.size, NODE_DEFAULT_SIZE[CanvasNodeType.Video].width, NODE_DEFAULT_SIZE[CanvasNodeType.Video].height) || NODE_DEFAULT_SIZE[CanvasNodeType.Video];
                     const isEmptyVideoNode = sourceNode?.type === CanvasNodeType.Video && !sourceNode.metadata?.content;
                     const videoId = isEmptyVideoNode ? nodeId : nanoid();
@@ -2618,7 +2633,7 @@ function InfiniteCanvasPage() {
                             videoMode: generationConfig.videoMode,
                             videoNegativePrompt: generationConfig.videoNegativePrompt,
                             videoFaceProcessing: generationConfig.videoFaceProcessing,
-                            references: generationReferenceUrls(generationContext),
+                            references: generationReferenceUrls(videoGenerationContext),
                         },
                     };
                     pendingChildIds = [videoId];
@@ -2639,8 +2654,8 @@ function InfiniteCanvasPage() {
                             videoMode: generationConfig.videoMode,
                             videoNegativePrompt: generationConfig.videoNegativePrompt,
                             videoFaceProcessing: generationConfig.videoFaceProcessing,
-                            references: generationReferenceUrls(generationContext),
-                        }, generationContext.referenceVideos, generationContext.referenceAudios);
+                            references: generationReferenceUrls(videoGenerationContext),
+                        }, referenceVideos, generationContext.referenceAudios);
                     } finally {
                         finishGenerationRequest(videoId, controller);
                     }
@@ -2865,6 +2880,28 @@ function InfiniteCanvasPage() {
                 return;
             }
             const retryImages = retryReferenceImages || [];
+            // Retrying an already-rendered video must keep that video as the
+            // first reference. ComfyUI's H3 Director interprets the first
+            // reference video as the v2v source timeline; without it a retry
+            // silently becomes text/reference generation.
+            const retryReferenceVideos =
+                node.type === CanvasNodeType.Video && node.metadata?.content
+                    ? [
+                          {
+                              id: node.id,
+                              name: `${node.title || node.id}.mp4`,
+                              type: node.metadata.mimeType || "video/mp4",
+                              url: node.metadata.content,
+                              storageKey: node.metadata.storageKey,
+                              bytes: node.metadata.bytes,
+                              width: node.metadata.naturalWidth,
+                              height: node.metadata.naturalHeight,
+                              durationMs: node.metadata.durationMs,
+                          } satisfies ReferenceVideo,
+                          ...(context?.referenceVideos || []),
+                      ]
+                    : context?.referenceVideos || [];
+            const uniqueRetryReferenceVideos = [...new Map(retryReferenceVideos.map((video) => [video.id || video.storageKey || video.url, video])).values()];
 
             setRunningNodeId(node.id);
             setNodes((prev) => prev.map((item) => (item.id === node.id ? { ...item, metadata: { ...item.metadata, status: NODE_STATUS_LOADING, errorDetails: undefined, images: item.metadata?.images?.map((image) => (image.id === imageId ? { ...image, status: NODE_STATUS_LOADING, errorDetails: undefined } : image)) } } : item)));
@@ -2896,7 +2933,7 @@ function InfiniteCanvasPage() {
                         videoMode: generationConfig.videoMode,
                         videoNegativePrompt: generationConfig.videoNegativePrompt,
                         videoFaceProcessing: generationConfig.videoFaceProcessing,
-                    }, context?.referenceVideos || [], context?.referenceAudios || []);
+                    }, uniqueRetryReferenceVideos, context?.referenceAudios || []);
                     return;
                 }
                 if (node.type === CanvasNodeType.Audio) {

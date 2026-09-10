@@ -62,7 +62,7 @@ export function ModelSelectModal({ open, channel, onConfirm, onClose }: { open: 
 
     const fetchModels = async () => {
         if (!channel) return;
-        if (!channel.baseUrl.trim() || (channel.apiFormat !== "autodl" && !channel.apiKey.trim())) {
+        if (!channel.baseUrl.trim() || (!["autodl", "comfyui"].includes(channel.apiFormat) && !channel.apiKey.trim())) {
             message.error(t("config.modelSelect.missingConfig"));
             return;
         }
@@ -112,7 +112,7 @@ export function ModelSelectModal({ open, channel, onConfirm, onClose }: { open: 
                 <Input className="min-w-[200px] flex-1" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t("config.modelSelect.search")} prefix={<Search className="size-4 text-stone-400" />} allowClear />
                 <Input className="min-w-[180px] flex-1" value={manual} onChange={(event) => setManual(event.target.value)} onPressEnter={addManual} placeholder={t("config.modelSelect.modelName")} />
                 <Button onClick={addManual}>{t("config.modelSelect.add")}</Button>
-                {channel?.apiFormat === "canvasvideo" ? null : (
+                {channel?.apiFormat === "canvasvideo" || channel?.apiFormat === "comfyui" ? null : (
                     <Button icon={<RefreshCw className="size-4" />} loading={loading} onClick={() => void fetchModels()}>
                         {t("config.modelSelect.fetch")}
                     </Button>

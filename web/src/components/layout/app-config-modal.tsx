@@ -74,7 +74,7 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
     };
 
     const finishConfig = () => {
-        const ready = config.channels.some((channel) => channel.baseUrl.trim() && channel.apiKey.trim() && channel.models.length);
+        const ready = config.channels.some((channel) => channel.baseUrl.trim() && (channel.apiFormat === "comfyui" || channel.apiKey.trim()) && channel.models.length);
         setConfigDialogOpen(false);
         if (!ready) return;
         message.success(t(shouldPromptContinue ? "config.savedContinue" : "config.saved"));
@@ -441,6 +441,7 @@ function apiFormatLabel(apiFormat: ApiCallFormat) {
     if (apiFormat === "volcengine") return "火山方舟";
     if (apiFormat === "zizidonghua") return "字字动画";
     if (apiFormat === "autodl") return "AutoDL ComfyUI";
+    if (apiFormat === "comfyui") return "原生 ComfyUI";
     if (apiFormat === "canvasvideo") return "Canvas 开放视频 API";
     if (apiFormat === "shafu") return "Shafu 多协议";
     return "OpenAI";

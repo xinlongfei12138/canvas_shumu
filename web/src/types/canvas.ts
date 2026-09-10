@@ -84,7 +84,7 @@ export type CanvasNodeMetadata = {
     bytes?: number;
     durationMs?: number;
     videoTaskId?: string;
-    videoTaskProvider?: "openai" | "gemini" | "volcengine" | "zizidonghua" | "autodl" | "canvasvideo" | "shafu" | "plugin" | "wuhen";
+    videoTaskProvider?: "openai" | "gemini" | "volcengine" | "zizidonghua" | "autodl" | "comfyui" | "canvasvideo" | "shafu" | "plugin" | "wuhen";
     videoTaskProtocol?: "unified" | "legacy";
     wuhenInputKey?: string;
     wuhenOutputKey?: string;

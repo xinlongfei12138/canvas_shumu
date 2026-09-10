@@ -965,7 +965,7 @@ function parseGeminiImagePayload(payload: GeminiPayload) {
 
 export async function requestGeneration(config: AiConfig, prompt: string, options?: RequestOptions) {
     const requestConfig = resolveModelRequestConfig(config, config.model || config.imageModel);
-    if (requestConfig.apiFormat === "canvasvideo") throw new Error(i18n.t("providerErrors.canvasVideoCapabilityUnsupported", { capability: apiText("capabilityImage") }));
+    if (requestConfig.apiFormat === "canvasvideo" || requestConfig.apiFormat === "comfyui") throw new Error(i18n.t("providerErrors.canvasVideoCapabilityUnsupported", { capability: apiText("capabilityImage") }));
     const n = Math.max(1, Math.min(15, Math.floor(Math.abs(Number(config.count)) || 1)));
     const script = resolveModelScript(config, config.model || config.imageModel);
     if (script) {
@@ -1061,7 +1061,7 @@ export async function requestGeneration(config: AiConfig, prompt: string, option
 
 export async function requestEdit(config: AiConfig, prompt: string, references: ReferenceImage[], options?: RequestOptions) {
     const requestConfig = resolveModelRequestConfig(config, config.model || config.imageModel);
-    if (requestConfig.apiFormat === "canvasvideo") throw new Error(i18n.t("providerErrors.canvasVideoCapabilityUnsupported", { capability: apiText("capabilityImage") }));
+    if (requestConfig.apiFormat === "canvasvideo" || requestConfig.apiFormat === "comfyui") throw new Error(i18n.t("providerErrors.canvasVideoCapabilityUnsupported", { capability: apiText("capabilityImage") }));
     const n = Math.max(1, Math.min(15, Math.floor(Math.abs(Number(config.count)) || 1)));
     const requestPrompt = buildImageReferencePromptText(prompt, references);
     const script = resolveModelScript(config, config.model || config.imageModel);
@@ -1161,7 +1161,7 @@ export async function requestEdit(config: AiConfig, prompt: string, references: 
 
 export async function requestImageQuestion(config: AiConfig, messages: AiTextMessage[], onDelta: (text: string) => void, options?: RequestOptions) {
     const requestConfig = resolveModelRequestConfig(config, config.model || config.textModel);
-    if (requestConfig.apiFormat === "canvasvideo") throw new Error(i18n.t("providerErrors.canvasVideoCapabilityUnsupported", { capability: apiText("capabilityText") }));
+    if (requestConfig.apiFormat === "canvasvideo" || requestConfig.apiFormat === "comfyui") throw new Error(i18n.t("providerErrors.canvasVideoCapabilityUnsupported", { capability: apiText("capabilityText") }));
     const script = resolveModelScript(config, config.model || config.textModel);
     if (script) {
         try {
@@ -1208,7 +1208,7 @@ export async function fetchImageModels(config: Pick<AiConfig, "baseUrl" | "apiKe
     try {
         if (config.apiFormat === "autodl") return [...AUTODL_WORKFLOW_MODELS];
         if (config.apiFormat === "volcengine") throw new Error(apiText("providerModelListUnsupported"));
-        if (config.apiFormat === "canvasvideo") throw new Error(i18n.t("providerErrors.canvasVideoModelListUnsupported"));
+        if (config.apiFormat === "canvasvideo" || config.apiFormat === "comfyui") throw new Error(i18n.t("providerErrors.canvasVideoModelListUnsupported"));
         if (config.apiFormat === "gemini") {
             const response = await axios.get<GeminiPayload>(geminiApiUrl({ ...defaultGeminiConfig, ...config }), { headers: geminiHeaders({ ...defaultGeminiConfig, ...config }) });
             validateGeminiPayload(response.data);

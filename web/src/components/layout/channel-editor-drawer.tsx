@@ -1,9 +1,10 @@
 import { Button, Drawer, Input, Segmented, Select, Space } from "antd";
-import { ListPlus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { FileJson, ListPlus, Trash2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { channelModelsForApiFormat, defaultBaseUrlForApiFormat, guessCapability, isFixedVideoApiFormat, type ApiCallFormat, type ChannelModel, type ModelCapability, type ModelChannel } from "@/stores/use-config-store";
+import { parseComfyWorkflow } from "@/services/api/comfyui";
 import { ModelScriptEditor } from "./model-script-editor";
 import { ModelSelectModal } from "./model-select-modal";
 
@@ -14,12 +15,14 @@ export function ChannelEditorDrawer({ open, channel, onSave, onClose }: { open: 
     const [draft, setDraft] = useState<ModelChannel | null>(channel);
     const [selectOpen, setSelectOpen] = useState(false);
     const [scriptTarget, setScriptTarget] = useState<ScriptTarget | null>(null);
+    const workflowInputRef = useRef<HTMLInputElement>(null);
     const apiFormatOptions: Array<{ label: string; value: ApiCallFormat }> = [
         { label: "OpenAI", value: "openai" },
         { label: "Gemini", value: "gemini" },
         { label: "火山方舟", value: "volcengine" },
         { label: "字字动画", value: "zizidonghua" },
         { label: "AutoDL ComfyUI", value: "autodl" },
+        { label: "原生 ComfyUI", value: "comfyui" },
         { label: "Canvas 开放视频 API", value: "canvasvideo" },
         { label: "Shafu 多协议", value: "shafu" },
     ];
@@ -41,7 +44,24 @@ export function ChannelEditorDrawer({ open, channel, onSave, onClose }: { open: 
 
     const applySelection = (models: ChannelModel[]) => {
         const map = new Map(draft.models.map((model) => [model.name, model]));
-        setModels(channelModelsForApiFormat(draft.apiFormat, models.map((model) => ({ ...model, script: map.get(model.name)?.script || model.script }))));
+        setModels(channelModelsForApiFormat(draft.apiFormat, models.map((model) => ({ ...model, script: map.get(model.name)?.script || model.script, workflowJson: map.get(model.name)?.workflowJson || model.workflowJson }))));
+    };
+
+    const importWorkflow = async (file: File) => {
+        if (draft.apiFormat !== "comfyui") return;
+        try {
+            const workflowJson = (await file.text()).trim();
+            parseComfyWorkflow(workflowJson);
+            const fallbackName = file.name.replace(/\.json$/i, "") || "ComfyUI 工作流";
+            const name = window.prompt("请输入工作流模型名称", fallbackName)?.trim();
+            if (!name) return;
+            const existing = draft.models.find((model) => model.name === name);
+            setModels(channelModelsForApiFormat(draft.apiFormat, [...draft.models.filter((model) => model.name !== name), { ...(existing || {}), name, capability: "video", workflowJson }]));
+        } catch {
+            window.alert("工作流 JSON 无法解析，请导出 ComfyUI API Prompt JSON 后重试");
+        } finally {
+            if (workflowInputRef.current) workflowInputRef.current.value = "";
+        }
     };
 
     const setCapability = (name: string, capability: ModelCapability) => setModels(draft.models.map((model) => (model.name === name ? { ...model, capability } : model)));
@@ -83,7 +103,7 @@ export function ChannelEditorDrawer({ open, channel, onSave, onClose }: { open: 
                     <Input value={draft.baseUrl} onChange={(event) => patch({ baseUrl: event.target.value })} placeholder="https://api.example.com" />
                 </label>
                 <label className="block md:col-span-2">
-                    <span className="mb-1 block text-sm font-medium">API Key</span>
+                    <span className="mb-1 block text-sm font-medium">API Key{draft.apiFormat === "comfyui" ? "（可选）" : ""}</span>
                     <Input.Password value={draft.apiKey} onChange={(event) => patch({ apiKey: event.target.value })} placeholder="sk-..." />
                 </label>
             </div>
@@ -93,9 +113,11 @@ export function ChannelEditorDrawer({ open, channel, onSave, onClose }: { open: 
                     <div className="text-sm font-semibold">{t("config.channelEditor.models")}</div>
                     <div className="mt-0.5 text-xs text-stone-500">{t("config.channelEditor.modelDescription", { count: draft.models.length })}</div>
                 </div>
-                <Button type="primary" icon={<ListPlus className="size-4" />} onClick={() => setSelectOpen(true)}>
-                    {t("config.channelEditor.selectModels")}
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                    {draft.apiFormat === "comfyui" ? <Button icon={<FileJson className="size-4" />} onClick={() => workflowInputRef.current?.click()}>导入工作流</Button> : null}
+                    <Button type="primary" icon={<ListPlus className="size-4" />} onClick={() => setSelectOpen(true)}>{t("config.channelEditor.selectModels")}</Button>
+                    {draft.apiFormat === "comfyui" ? <input ref={workflowInputRef} type="file" accept="application/json,.json" className="hidden" onChange={(event) => event.target.files?.[0] && void importWorkflow(event.target.files[0])} /> : null}
+                </div>
             </div>
 
             <div className="space-y-2 rounded-lg border border-stone-200 p-2 dark:border-stone-800">

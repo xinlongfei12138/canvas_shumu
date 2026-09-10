@@ -23,7 +23,7 @@ function aiHeaders(config: AiConfig) {
 export async function requestAudioGeneration(config: AiConfig, prompt: string, options?: RequestOptions): Promise<Blob> {
     const requestConfig = resolveModelRequestConfig(config, config.model || config.audioModel);
     const model = requestConfig.model.trim();
-    if (requestConfig.apiFormat === "canvasvideo") throw new Error(i18n.t("providerErrors.canvasVideoCapabilityUnsupported", { capability: i18n.t("providerErrors.capabilityAudio") }));
+    if (requestConfig.apiFormat === "canvasvideo" || requestConfig.apiFormat === "comfyui") throw new Error(i18n.t("providerErrors.canvasVideoCapabilityUnsupported", { capability: i18n.t("providerErrors.capabilityAudio") }));
     if (requestConfig.apiFormat === "shafu") throw new Error(i18n.t("providerErrors.shafuCapabilityUnsupported", { capability: i18n.t("providerErrors.capabilityAudio") }));
     const format = normalizeAudioFormatValue(config.audioFormat);
     const script = resolveModelScript(config, config.model || config.audioModel);
