@@ -40,7 +40,7 @@ export function getAutoDlWorkflowSpec(workflowId: string) {
     return AUTODL_WORKFLOW_SPECS.find((workflow) => workflow.id === workflowId);
 }
 
-export function providerApiUrl(baseUrl: string, path: string) {
+export function providerApiUrl(baseUrl: string, path: string, options?: { bypassProxy?: boolean }) {
     const normalizedBaseUrl = baseUrl.trim().replace(/\/+$/, "");
     const normalizedPath = `/${path.replace(/^\/+/, "")}`;
     const lowerBaseUrl = normalizedBaseUrl.toLowerCase();
@@ -48,7 +48,8 @@ export function providerApiUrl(baseUrl: string, path: string) {
     const apiBaseUrl = lowerBaseUrl.endsWith("/v1") && lowerPath.startsWith("/v8/") ? normalizedBaseUrl.slice(0, -3) : normalizedBaseUrl;
     const overlappingPrefix = ["/api/v3", "/api/v1", "/v8", "/v1"].find((prefix) => lowerBaseUrl.endsWith(prefix) && (lowerPath === prefix || lowerPath.startsWith(`${prefix}/`)));
     const joinedPath = overlappingPrefix ? normalizedPath.slice(overlappingPrefix.length) : normalizedPath;
-    return withLocalProxy(`${apiBaseUrl}${joinedPath}`);
+    const url = `${apiBaseUrl}${joinedPath}`;
+    return options?.bypassProxy ? url : withLocalProxy(url);
 }
 
 export function textApiPath(apiFormat: ApiCallFormat) {

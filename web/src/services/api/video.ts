@@ -367,7 +367,7 @@ async function createComfyUiVideoTask(config: AiConfig, model: string, prompt: s
     const resolution = canvasResolutionToMiniMaxH3(config.vquality, config.size);
     const body = prepareComfyVideoWorkflow(workflow, prompt.trim(), Number(rawVideoSeconds(config.videoSeconds)), resolution, { images, videos, audios }, config.videoMode);
     try {
-        const payload = (await axios.post<{ prompt_id?: string; number?: number; error?: unknown }>(providerApiUrl(config.baseUrl, "/prompt"), { prompt: body }, { headers: comfyHeaders(config), signal: options?.signal })).data;
+        const payload = (await axios.post<{ prompt_id?: string; number?: number; error?: unknown }>(providerApiUrl(config.baseUrl, "/prompt", { bypassProxy: true }), { prompt: body }, { headers: comfyHeaders(config), signal: options?.signal })).data;
         const id = payload.prompt_id || (typeof payload.number === "number" ? String(payload.number) : "");
         if (!id) throw new Error(readApiErrorMessage(payload.error) || apiText("noVideoTaskId"));
         return { id, provider: "comfyui", model };
@@ -378,7 +378,7 @@ async function createComfyUiVideoTask(config: AiConfig, model: string, prompt: s
 
 async function pollComfyUiVideoTask(config: AiConfig, task: VideoGenerationTask, options?: RequestOptions): Promise<VideoGenerationTaskState> {
     try {
-        const payload = (await axios.get<unknown>(providerApiUrl(config.baseUrl, `/history/${encodeURIComponent(task.id)}`), { headers: comfyHeaders(config), signal: options?.signal })).data;
+        const payload = (await axios.get<unknown>(providerApiUrl(config.baseUrl, `/history/${encodeURIComponent(task.id)}`, { bypassProxy: true }), { headers: comfyHeaders(config), signal: options?.signal })).data;
         const record = payload && typeof payload === "object" ? (payload as Record<string, unknown>)[task.id] : undefined;
         if (!record) return { status: "pending" };
         const status = record && typeof record === "object" ? (record as Record<string, unknown>).status : undefined;
@@ -390,7 +390,7 @@ async function pollComfyUiVideoTask(config: AiConfig, task: VideoGenerationTask,
             return completed ? { status: "failed", error: "ComfyUI 任务已完成，但工作流没有输出可下载的视频" } : { status: "pending" };
         }
         const params = new URLSearchParams({ filename: output.filename, subfolder: output.subfolder || "", type: output.type || "output" });
-        const response = await axios.get<Blob>(providerApiUrl(config.baseUrl, `/view?${params.toString()}`), { headers: comfyHeaders(config), responseType: "blob", signal: options?.signal });
+        const response = await axios.get<Blob>(providerApiUrl(config.baseUrl, `/view?${params.toString()}`, { bypassProxy: true }), { headers: comfyHeaders(config), responseType: "blob", signal: options?.signal });
         await assertVideoBlob(response.data);
         return { status: "completed", result: { blob: normalizeComfyVideoBlob(response.data, output.filename) } };
     } catch (error) {
@@ -409,7 +409,7 @@ async function uploadComfyMedia(config: AiConfig, file: File, kind: "image" | "v
     body.append("type", "input");
     body.append("overwrite", "false");
     try {
-        const response = await axios.post<unknown>(providerApiUrl(config.baseUrl, "/upload/image"), body, { headers: comfyHeaders(config), signal: options?.signal });
+        const response = await axios.post<unknown>(providerApiUrl(config.baseUrl, "/upload/image", { bypassProxy: true }), body, { headers: comfyHeaders(config), signal: options?.signal });
         const uploaded = comfyUploadResponse(response.data);
         if (!uploaded) throw new Error("ComfyUI 上传接口未返回可用文件名");
         return uploaded;
@@ -438,7 +438,7 @@ async function uploadComfyChunkedMedia(config: AiConfig, file: File, endpoint: s
         body.append("filename", filename);
         body.append("chunk", file.slice(index * chunkSize, Math.min((index + 1) * chunkSize, file.size)), filename + ".part");
         try {
-            const response = await axios.post<unknown>(providerApiUrl(config.baseUrl, endpoint), body, { headers: comfyHeaders(config), signal: options?.signal });
+            const response = await axios.post<unknown>(providerApiUrl(config.baseUrl, endpoint, { bypassProxy: true }), body, { headers: comfyHeaders(config), signal: options?.signal });
             const uploaded = comfyUploadResponse(response.data);
             if (uploaded) return uploaded;
         } catch (error) {
