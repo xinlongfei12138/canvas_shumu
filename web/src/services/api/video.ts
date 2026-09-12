@@ -361,7 +361,7 @@ async function createComfyUiVideoTask(config: AiConfig, model: string, prompt: s
     const workflowJson = resolveModelWorkflowJson(config, model);
     if (!workflowJson) throw new Error("ComfyUI 模型尚未绑定 API Prompt 工作流 JSON，请在模型配置中添加工作流");
     const workflow = parseComfyWorkflow(workflowJson);
-    const images = await Promise.all(references.map(async (image) => uploadComfyMedia(config, dataUrlToFile({ ...image, dataUrl: await imageToDataUrl(image, options) }), "image", options)));
+    const images = await Promise.all(references.map(async (image) => uploadComfyMedia(config, dataUrlToFile({ ...image, dataUrl: await imageToDataUrl(image, { ...options, bypassProxy: true }) }), "image", options)));
     const videos = await Promise.all((options?.videos || []).map(async (video) => uploadComfyMedia(config, await referenceMediaToFile(video, "reference-video.mp4", "invalidReferenceVideo", options), "video", options)));
     const audios = await Promise.all((options?.audios || []).map(async (audio) => uploadComfyMedia(config, await referenceMediaToFile(audio, "reference-audio.mp3", "invalidReferenceAudio", options), "audio", options)));
     const resolution = canvasResolutionToMiniMaxH3(config.vquality, config.size);
@@ -399,12 +399,13 @@ async function pollComfyUiVideoTask(config: AiConfig, task: VideoGenerationTask,
 }
 
 async function uploadComfyMedia(config: AiConfig, file: File, kind: "image" | "video" | "audio", options?: RequestOptions) {
-    if (kind === "video") return uploadComfyChunkedMedia(config, file, "/minimax/director/upload_chunk", "ComfyUI 视频分片上传失败", "reference-video.mp4", options);
-    if (kind === "audio") return uploadComfyChunkedMedia(config, file, "/minimax/director/prepare_reference_audio_chunk", "ComfyUI 音频分片上传失败", "reference-audio.mp3", options);
+    const chunkSize = 1024 * 1024;
+    if (kind === "video") return uploadComfyChunkedMedia(config, file, "/minimax/director/upload_chunk", "ComfyUI 视频分片上传失败", "reference-video.mp4", options, chunkSize);
+    if (kind === "audio") return uploadComfyChunkedMedia(config, file, "/minimax/director/upload_chunk", "ComfyUI 音频分片上传失败", "reference-audio.mp3", options, chunkSize);
+    if (file.size > chunkSize) return uploadComfyChunkedMedia(config, file, "/minimax/director/upload_chunk", "ComfyUI 图片分片上传失败", "reference-image.png", options, chunkSize);
     const body = new FormData();
-    // Images use ComfyUI's core upload route. Director provides dedicated
-    // chunk routes for video and audio so both are validated and placed in
-    // the input directory with the filename returned to the timeline JSON.
+    // Small images use ComfyUI's core route. Larger images use Director's
+    // generic chunk route so Cloudflare never has to proxy one large body.
     body.append("image", file, file.name || `reference.${kind}`);
     body.append("type", "input");
     body.append("overwrite", "false");
@@ -425,8 +426,7 @@ function normalizeComfyVideoBlob(blob: Blob, filename: string) {
     return new Blob([blob], { type: mimeType });
 }
 
-async function uploadComfyChunkedMedia(config: AiConfig, file: File, endpoint: string, errorMessage: string, fallbackName: string, options?: RequestOptions) {
-    const chunkSize = 8 * 1024 * 1024;
+async function uploadComfyChunkedMedia(config: AiConfig, file: File, endpoint: string, errorMessage: string, fallbackName: string, options?: RequestOptions, chunkSize = 8 * 1024 * 1024) {
     const uploadId = nanoid();
     const filename = safeComfyFilename(file.name || fallbackName);
     const totalChunks = Math.ceil(file.size / chunkSize);
@@ -442,7 +442,7 @@ async function uploadComfyChunkedMedia(config: AiConfig, file: File, endpoint: s
             const uploaded = comfyUploadResponse(response.data);
             if (uploaded) return uploaded;
         } catch (error) {
-            throw new Error(readAxiosError(error, errorMessage));
+            throw new Error(readAxiosError(error, `${errorMessage}（${index + 1}/${totalChunks}）`));
         }
     }
     throw new Error(errorMessage.replace(/失败$/, "") + "未返回文件名");
